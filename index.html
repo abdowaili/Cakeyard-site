@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Cakeyard | نظام الكاشير</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#5B2C83;
+    --purple-dark:#3E1D5C;
+    --purple-light:#F1EAF8;
+    --gold:#CE9B44;
+    --gold-light:#FBF1DE;
+    --bg:#FBF8F4;
+    --card:#FFFFFF;
+    --ink:#2B2233;
+    --muted:#8A7E96;
+    --border:#EBE2F2;
+    --green:#3F7D58;
+    --green-light:#EAF4EE;
+    --red:#B94A48;
+    --red-light:#FBEAE9;
+    --radius:16px;
+    --radius-sm:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Tajawal',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:var(--bg);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    padding-bottom:72px;
+  }
+  /* Header */
+  header{
+    position:sticky;
+    top:0;
+    z-index:20;
+    background:var(--purple);
+    color:#fff;
+    padding:16px 18px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-shadow:0 2px 10px rgba(91,44,131,0.18);
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-weight:800;
+    font-size:19px;
+    letter-spacing:0.2px;
+  }
+  .brand .emoji{font-size:22px;}
+  header .date-today{
+    font-size:12.5px;
+    color:#E9DBF5;
+    font-weight:500;
+  }
+  /* Tabs content area */
+  main{
+    flex:1;
+    padding:16px 16px 8px;
+  }
+  .hidden{display:none !important;}
+  /* Segmented control */
+  .segmented{
+    display:flex;
+    background:var(--purple-light);
+    border-radius:999px;
+    padding:4px;
+    margin-bottom:16px;
+  }
+  .segmented button{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:9px 4px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    color:var(--purple);
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease;
+  }
+  .segmented button.active{
+    background:var(--purple);
+    color:#fff;
+  }
+  /* Hero stat */
+  .hero-card{
+    background:linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+    border-radius:var(--radius);
+    padding:20px 20px 18px;
+    color:#fff;
+    margin-bottom:12px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero-card .label{
+    font-size:13px;
+    color:#DCC7EE;
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .hero-card .value{
+    font-size:32px;
+    font-weight:900;
+    line-height:1.2;
+  }
+  .hero-card .value.negative{color:#FFC9C7;}
+  .hero-card .sub{
+    font-size:12px;
+    color:#D8C3EA;
+    margin-top:6px;
+  }
+  .stats-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .stat-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:13px 14px;
+  }
+  .stat-card .icon{font-size:18px;margin-bottom:6px;display:block;}
+  .stat-card .label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+  .stat-card .value{font-size:16.5px;font-weight:800;}
+  .stat-card.cogs .value{color:var(--ink);}
+  .stat-card.expense .value{color:var(--red);}
+  .stat-card.qty .value{color:var(--purple);}
+  .section-title{
+    font-size:15px;
+    font-weight:800;
+    margin:6px 0 10px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .top-products{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 14px 6px;
+    margin-bottom:16px;
+  }
+  .top-row{
+    margin-bottom:12px;
+  }
+  .top-row .top-row-head{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-bottom:5px;
+  }
+  .top-row .top-row-head .name{font-weight:700;}
+  .top-row .top-row-head .qty{color:var(--muted);font-weight:600;}
+  .bar-track{
+    height:8px;
+    background:var(--purple-light);
+    border-radius:6px;
+    overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--gold), var(--purple));
+    border-radius:6px;
+  }
+  /* List tab header + add button */
+  .tab-header-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .tab-header-row h2{
+    font-size:18px;
+    font-weight:800;
+    margin:0;
+  }
+  .btn-add{
+    background:var(--gold);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:10px 16px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:13.5px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    box-shadow:0 3px 8px rgba(206,155,68,0.35);
+  }
+  .btn-add:active{transform:scale(0.97);}
+  /* Day group */
+  .day-group{margin-bottom:16px;}
+  .day-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-size:13px;
+    color:var(--muted);
+    font-weight:700;
+    padding:0 4px 8px;
+    border-bottom:1px dashed var(--border);
+    margin-bottom:8px;
+  }
+  .day-header .total{color:var(--purple);font-weight:800;}
+  .entry-row{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .entry-main{flex:1;}
+  .entry-title{font-weight:700;font-size:14.5px;}
+  .entry-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .entry-amount{font-weight:800;font-size:14.5px;margin-inline-end:10px;white-space:nowrap;}
+  .entry-amount.sale{color:var(--green);}
+  .entry-amount.expense{color:var(--red);}
+  .entry-actions{display:flex;gap:4px;}
+  .icon-btn{
+    background:none;
+    border:none;
+    font-size:16px;
+    padding:5px 6px;
+    cursor:pointer;
+    border-radius:8px;
+    opacity:0.75;
+  }
+  .icon-btn:active{background:var(--purple-light);}
+  /* Products */
+  .category-group{margin-bottom:18px;}
+  .category-title{
+    font-size:13px;
+    font-weight:800;
+    color:var(--purple);
+    margin-bottom:8px;
+    padding:0 4px;
+  }
+  .product-row{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+  }
+  .product-name{font-weight:700;font-size:14.5px;}
+  .product-meta{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .product-price{font-weight:800;font-size:14.5px;color:var(--purple);white-space:nowrap;margin-inline-end:8px;}
+  /* Empty state */
+  .empty-state{
+    text-align:center;
+    padding:50px 20px;
+    color:var(--muted);
+  }
+  .empty-state .emoji{font-size:38px;display:block;margin-bottom:10px;}
+  .empty-state .msg{font-size:14px;font-weight:600;}
+  /* Bottom nav */
+  nav.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translateX(-50%);
+    width:100%;
+    max-width:480px;
+    background:#fff;
+    border-top:1px solid var(--border);
+    display:flex;
+    z-index:30;
+    padding:6px 0 8px;
+  }
+  nav.bottom-nav button{
+    flex:1;
+    background:none;
+    border:none;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    font-family:inherit;
+    color:var(--muted);
+    padding:6px 0;
+    cursor:pointer;
+  }
+  nav.bottom-nav button .nav-icon{font-size:20px;}
+  nav.bottom-nav button .nav-label{font-size:11px;font-weight:700;}
+  nav.bottom-nav button.active{color:var(--purple);}
+  /* Bottom sheet modal */
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(43,34,51,0.45);
+    z-index:40;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .sheet{
+    position:fixed;
+    bottom:0;
+    left:50%;
+    transform:translate(-50%, 100%);
+    width:100%;
+    max-width:480px;
+    background:#fff;
+    border-radius:20px 20px 0 0;
+    z-index:41;
+    padding:18px 20px calc(20px + env(safe-area-inset-bottom));
+    transition:transform .25s ease;
+    max-height:85vh;
+    overflow-y:auto;
+  }
+  .sheet.show{transform:translate(-50%, 0);}
+  .sheet-handle{
+    width:38px;height:4px;background:var(--border);border-radius:3px;
+    margin:0 auto 14px;
+  }
+  .sheet h3{
+    font-size:17px;
+    font-weight:800;
+    margin:0 0 16px;
+    text-align:center;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    font-family:inherit;
+    font-size:15px;
+    padding:11px 12px;
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);
+    background:#fff;
+    color:var(--ink);
+  }
+  .field input:focus, .field select:focus{
+    outline:none;
+    border-color:var(--purple);
+  }
+  .qty-stepper{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .qty-stepper button{
+    width:40px;height:40px;
+    border-radius:10px;
+    border:1.5px solid var(--border);
+    background:var(--purple-light);
+    color:var(--purple);
+    font-size:19px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .qty-stepper input{
+    text-align:center;
+    flex:1;
+  }
+  .live-total{
+    background:var(--gold-light);
+    border-radius:var(--radius-sm);
+    padding:11px 14px;
+    display:flex;
+    justify-content:space-between;
+    font-weight:800;
+    font-size:15px;
+    color:var(--purple-dark);
+    margin-bottom:16px;
+  }
+  .sheet-actions{
+    display:flex;
+    gap:10px;
+    margin-top:4px;
+  }
+  .btn{
+    flex:1;
+    padding:13px;
+    border-radius:12px;
+    border:none;
+    font-family:inherit;
+    font-weight:800;
+    font-size:14.5px;
+    cursor:pointer;
+  }
+  .btn-primary{background:var(--purple);color:#fff;}
+  .btn-secondary{background:var(--purple-light);color:var(--purple);}
+  .btn-danger{background:var(--red-light);color:var(--red);}
+  .loading-screen{
+    position:fixed;inset:0;background:var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    flex-direction:column;gap:10px;z-index:100;
+  }
+  .loading-screen .emoji{font-size:34px;animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.15);opacity:0.6;}}
+  .loading-screen .txt{color:var(--muted);font-weight:700;font-size:13px;}
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading-screen hidden">
+  <span class="emoji">🎂</span>
+  <span class="txt">جاري تحميل بيانات Cakeyard…</span>
+</div>
+
+<div id="setupScreen" class="loading-screen hidden" style="flex-direction:column;padding:26px 22px;gap:12px;text-align:center;overflow-y:auto;">
+  <span class="emoji" style="font-size:30px;">🔗</span>
+  <div style="font-weight:800;font-size:16px;">اربط النظام بمستودعك في GitHub</div>
+  <div style="font-size:12px;color:var(--muted);max-width:320px;line-height:1.6;">أنشئ مستودع خاص (Private) صغير لبياناتك، وتوكن وصول (Fine-grained) صلاحيته على هذا المستودع بس — القراءة والكتابة على Contents.</div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>اسم المستخدم أو المنظمة</label><input type="text" id="s-owner" placeholder="مثال: abdulrahman"></div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>اسم المستودع (خاص)</label><input type="text" id="s-repo" placeholder="مثال: cakeyard-data"></div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>الفرع</label><input type="text" id="s-branch" value="main"></div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>مسار ملف البيانات</label><input type="text" id="s-path" value="cakeyard-data.json"></div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>GitHub Token</label><input type="password" id="s-token" placeholder="github_pat_..."></div>
+  <button class="btn btn-primary" id="setupSubmit" style="width:100%;max-width:320px;">ربط واختبار الاتصال</button>
+  <div id="setupError" style="color:var(--red);font-size:12.5px;display:none;max-width:320px;"></div>
+</div>
+
+<div id="pinScreen" class="loading-screen hidden" style="flex-direction:column;gap:14px;">
+  <span class="emoji">🔒</span>
+  <div style="font-weight:800;font-size:16px;">أدخل رمز الدخول</div>
+  <input type="password" id="pinInput" inputmode="numeric" style="text-align:center;font-size:20px;letter-spacing:6px;width:160px;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-family:inherit;">
+  <button class="btn btn-primary" id="pinSubmit" style="width:160px;">دخول</button>
+  <div id="pinError" style="color:var(--red);font-size:12.5px;display:none;">رمز غير صحيح</div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="brand"><span class="emoji">🎂</span> Cakeyard</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="syncStatus" style="font-size:11px;color:#DCC7EE;"></span>
+      <div class="date-today" id="headerDate"></div>
+      <button id="backupBtn" aria-label="الإعدادات والنسخ الاحتياطي" style="background:none;border:none;color:#fff;font-size:19px;cursor:pointer;padding:2px 4px;">⚙️</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="tab-dashboard">
+      <div class="segmented" id="periodSeg">
+        <button data-period="today" class="active">اليوم</button>
+        <button data-period="month">شهر محدد</button>
+        <button data-period="all">كل الفترة</button>
+      </div>
+      <div class="field" id="monthPickerWrap" style="display:none;margin-top:-8px;margin-bottom:16px;">
+        <input type="month" id="monthPicker">
+      </div>
+
+      <div class="hero-card">
+        <div class="label">صافي الربح</div>
+        <div class="value" id="statNetProfit">0.000 ر.ع</div>
+        <div class="sub" id="statRevenueSub">إجمالي المبيعات: 0.000 ر.ع</div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card cogs">
+          <span class="icon">🧁</span>
+          <div class="label">تكلفة المواد</div>
+          <div class="value" id="statCogs">0.000 ر.ع</div>
+        </div>
+        <div class="stat-card expense">
+          <span class="icon">💸</span>
+          <div class="label">مصروفات تشغيلية</div>
+          <div class="value" id="statOpEx">0.000 ر.ع</div>
+        </div>
+        <div class="stat-card qty">
+          <span class="icon">📦</span>
+          <div class="label">القطع المباعة</div>
+          <div class="value" id="statQty">0</div>
+        </div>
+        <div class="stat-card">
+          <span class="icon">🧾</span>
+          <div class="label">عدد العمليات</div>
+          <div class="value" id="statCount">0</div>
+        </div>
+      </div>
+
+      <div class="section-title">📦 أفضل الأصناف مبيعاً</div>
+      <div class="top-products" id="topProducts"></div>
+    </section>
+
+    <!-- Sales -->
+    <section id="tab-sales" class="hidden">
+      <div class="tab-header-row">
+        <h2>💰 المبيعات</h2>
+        <button class="btn-add" id="addSaleBtn">＋ تسجيل بيعة</button>
+      </div>
+      <div id="salesList"></div>
+    </section>
+
+    <!-- Expenses -->
+    <section id="tab-expenses" class="hidden">
+      <div class="tab-header-row">
+        <h2>💸 المصروفات</h2>
+        <button class="btn-add" id="addExpenseBtn">＋ تسجيل مصروف</button>
+      </div>
+      <div id="expensesList"></div>
+    </section>
+
+    <!-- Products -->
+    <section id="tab-products" class="hidden">
+      <div class="tab-header-row">
+        <h2>🎂 الأصناف</h2>
+        <button class="btn-add" id="addProductBtn">＋ إضافة صنف</button>
+      </div>
+      <div id="productsList"></div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-tab="dashboard" class="active"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></button>
+    <button data-tab="sales"><span class="nav-icon">💰</span><span class="nav-label">المبيعات</span></button>
+    <button data-tab="expenses"><span class="nav-icon">💸</span><span class="nav-label">المصروفات</span></button>
+    <button data-tab="products"><span class="nav-icon">🎂</span><span class="nav-label">الأصناف</span></button>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  const EXPENSE_TYPES = ["شراء مواد خام","إيجار","كهرباء وماء","تغليف وتعبئة","تسويق وإعلان","نقل وتوصيل","رواتب","صيانة وأدوات","أخرى"];
+  const MATERIAL_TYPE = "شراء مواد خام";
+  const DEFAULT_CATEGORIES = ["كوكيز","تشيزكيك","كيك","براونيز","أخرى"];
+
+  const SEED_PRODUCTS = [
+    ["سكوب كوكيز","كوكيز",10,6.006],
+    ["سان سباستيان","تشيزكيك",11,6.313],
+    ["تشيزكيك مختلف نكهات مطبوخة","تشيزكيك",12,7.749],
+    ["تشيزكيك سادة مطبوخة","تشيزكيك",10,5.474],
+    ["كوكيز كلاسيك","كوكيز",9,3.525],
+    ["شوكلت كيك","كيك",10,2.307],
+    ["فانيليا كيك","كيك",9,1.651],
+    ["كوكيز محشي","كوكيز",10,2.579],
+    ["كيكة شوكلت مع غناش","كيك",14,8.866],
+    ["كيكه شوكلت ماتيلدا","كيك",18,5.751],
+    ["براونيز فدج","براونيز",12,7.873],
+    ["براونيز تشوي كيكي","براونيز",10,4.207],
+    ["كوكيز كلاسيك وصفة عبدو","كوكيز",0.5,0.188],
+    ["تشيزكيك بارد","تشيزكيك",11,7.019],
+    ["بوكس رمضان","كوكيز",5.5,0],
+    ["كيكة فانيليا مع كريمه بنكهه","كيك",12,6.234],
+    ["تشيزكيك بارد ارتفاع اكثر","تشيزكيك",12,9.098],
+    ["تشيزكيك بارد ارتفاع الفراوله","تشيزكيك",12,7.518],
+    ["تشيزكيك بارد ارتفاع لوتس","تشيزكيك",12,8.138],
+    ["تشيزكيك بارد ارتفاع بستاشو","تشيزكيك",12,8.778],
+    ["تشيزكيك بارد ارتفاع مانجو","تشيزكيك",12,7.518],
+    ["تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر","تشيزكيك",13,8.073],
+    ["كيك فانيليا بكريمة الفراولة صينية فرن","كيك",8,8.307]
+  ];
+
+  let products = [];
+  let sales = [];
+  let expenses = [];
+  let currentTab = "dashboard";
+  let currentPeriod = "today";
+  let currentMonth = todayStr().slice(0,7);
+  let formType = null;
+  let editId = null;
+  let ghConfig = null;
+  let ghSha = null;
+
+  function utf8ToBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function base64ToUtf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,"")))); }
+
+  const $ = (sel, root) => (root||document).querySelector(sel);
+  const $all = (sel, root) => Array.from((root||document).querySelectorAll(sel));
+  const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const fmt = (n) => (Number(n)||0).toFixed(3)+" ر.ع";
+  const escapeHtml = (s) => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  function todayStr(){
+    const d = new Date();
+    const off = d.getTimezoneOffset();
+    return new Date(d.getTime()-off*60000).toISOString().slice(0,10);
+  }
+  function fmtDateHeading(dateStr){
+    const d = new Date(dateStr+"T12:00:00");
+    return new Intl.DateTimeFormat("ar", {weekday:"long", day:"numeric", month:"long", numberingSystem:"latn"}).format(d);
+  }
+  function fmtHeaderToday(){
+    const d = new Date();
+    return new Intl.DateTimeFormat("ar", {weekday:"long", day:"numeric", month:"long", numberingSystem:"latn"}).format(d);
+  }
+
+  // ---------- GitHub-backed storage ----------
+  function loadGhConfig(){
+    try{ return JSON.parse(localStorage.getItem("cy_gh_config")||"null"); }catch(e){ return null; }
+  }
+  function saveGhConfig(cfg){ localStorage.setItem("cy_gh_config", JSON.stringify(cfg)); }
+  function clearGhConfig(){ localStorage.removeItem("cy_gh_config"); }
+
+  function ghHeaders(){
+    return {
+      "Authorization": "Bearer "+ghConfig.token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28"
+    };
+  }
+  async function ghGetFile(){
+    const {owner, repo, path, branch} = ghConfig;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+    const res = await fetch(url, {headers: ghHeaders()});
+    if(res.status===404) return {notFound:true};
+    if(!res.ok) throw new Error(res.status+" "+(await res.text()).slice(0,200));
+    const json = await res.json();
+    ghSha = json.sha;
+    return {notFound:false, data: JSON.parse(base64ToUtf8(json.content))};
+  }
+  async function ghPutFile(dataObj, message){
+    const {owner, repo, path, branch} = ghConfig;
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+    const body = {
+      message: message || ("تحديث بيانات Cakeyard — "+new Date().toISOString()),
+      content: utf8ToBase64(JSON.stringify(dataObj, null, 2)),
+      branch
+    };
+    if(ghSha) body.sha = ghSha;
+    const res = await fetch(url, {method:"PUT", headers:{...ghHeaders(), "Content-Type":"application/json"}, body: JSON.stringify(body)});
+    if(!res.ok) throw new Error(res.status+" "+(await res.text()).slice(0,200));
+    const json = await res.json();
+    ghSha = json.content.sha;
+    return json;
+  }
+
+  function setSyncStatus(state){
+    const el = $("#syncStatus");
+    if(!el) return;
+    if(state==="saving") el.textContent = "⏳ يحفظ...";
+    else if(state==="synced"){ el.textContent = "✅ محفوظ"; setTimeout(()=>{ if(el.textContent==="✅ محفوظ") el.textContent=""; }, 2000); }
+    else if(state==="error") el.textContent = "⚠️ تعذر الحفظ";
+  }
+
+  async function persist(){
+    if(!ghConfig) return;
+    setSyncStatus("saving");
+    try{
+      await ghPutFile({products, sales, expenses});
+      setSyncStatus("synced");
+    }catch(err){
+      console.error("persist failed", err);
+      setSyncStatus("error");
+      alert("تعذر الحفظ في GitHub. تأكد من اتصال الإنترنت وصلاحية التوكن، وحاول مرة ثانية. بياناتك بقيت بالتطبيق مؤقتاً.");
+    }
+  }
+  async function saveProducts(){ await persist(); }
+  async function saveSales(){ await persist(); }
+  async function saveExpenses(){ await persist(); }
+
+  async function loadAll(){
+    const result = await ghGetFile();
+    if(result.notFound){
+      products = SEED_PRODUCTS.map(p => ({id:uid(), name:p[0], category:p[1], price:p[2], cost:p[3]}));
+      sales = [];
+      expenses = [];
+      await ghPutFile({products, sales, expenses}, "تهيئة بيانات Cakeyard");
+    } else {
+      const d = result.data || {};
+      products = Array.isArray(d.products) && d.products.length ? d.products : SEED_PRODUCTS.map(p => ({id:uid(), name:p[0], category:p[1], price:p[2], cost:p[3]}));
+      sales = Array.isArray(d.sales) ? d.sales : [];
+      expenses = Array.isArray(d.expenses) ? d.expenses : [];
+    }
+  }
+
+  // ---------- Tabs ----------
+  function switchTab(tab){
+    currentTab = tab;
+    ["dashboard","sales","expenses","products"].forEach(t=>{
+      $("#tab-"+t).classList.toggle("hidden", t!==tab);
+    });
+    $all("nav.bottom-nav button").forEach(b=>{
+      b.classList.toggle("active", b.dataset.tab===tab);
+    });
+    render();
+  }
+
+  // ---------- Period filtering ----------
+  function inPeriod(dateStr){
+    const today = todayStr();
+    if(currentPeriod==="today") return dateStr===today;
+    if(currentPeriod==="month") return dateStr.slice(0,7)===currentMonth;
+    return true;
+  }
+
+  // ---------- Rendering ----------
+  function render(){
+    if(currentTab==="dashboard") renderDashboard();
+    if(currentTab==="sales") renderSales();
+    if(currentTab==="expenses") renderExpenses();
+    if(currentTab==="products") renderProducts();
+  }
+
+  function renderDashboard(){
+    const periodSales = sales.filter(s=>inPeriod(s.date));
+    const periodExpenses = expenses.filter(e=>inPeriod(e.date));
+
+    const revenue = periodSales.reduce((a,s)=>a+s.total,0);
+    const cogs = periodSales.reduce((a,s)=>a+s.costTotal,0);
+    const totalExpenseAll = periodExpenses.reduce((a,e)=>a+e.value,0);
+    const materialExpense = periodExpenses.filter(e=>e.type===MATERIAL_TYPE).reduce((a,e)=>a+e.value,0);
+    const opEx = totalExpenseAll - materialExpense;
+    const netProfit = revenue - cogs - opEx;
+    const qty = periodSales.reduce((a,s)=>a+s.qty,0);
+
+    const npEl = $("#statNetProfit");
+    npEl.textContent = fmt(netProfit);
+    npEl.classList.toggle("negative", netProfit<0);
+    $("#statRevenueSub").textContent = "إجمالي المبيعات: "+fmt(revenue);
+    $("#statCogs").textContent = fmt(cogs);
+    $("#statOpEx").textContent = fmt(opEx);
+    $("#statQty").textContent = qty;
+    $("#statCount").textContent = periodSales.length;
+
+    // top products
+    const byProduct = {};
+    periodSales.forEach(s=>{
+      byProduct[s.productName] = (byProduct[s.productName]||0) + s.qty;
+    });
+    const top = Object.entries(byProduct).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxQty = top.length ? top[0][1] : 1;
+    const container = $("#topProducts");
+    if(top.length===0){
+      container.innerHTML = '<div class="empty-state" style="padding:24px 10px;"><span class="emoji">📊</span><span class="msg">لا توجد مبيعات في هذه الفترة بعد</span></div>';
+    } else {
+      container.innerHTML = top.map(([name,q])=>`
+        <div class="top-row">
+          <div class="top-row-head"><span class="name">${escapeHtml(name)}</span><span class="qty">${q} قطعة</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(q/maxQty*100)}%"></div></div>
+        </div>
+      `).join("");
+    }
+  }
+
+  function groupByDate(list){
+    const map = {};
+    list.forEach(item=>{
+      (map[item.date] = map[item.date] || []).push(item);
+    });
+    return Object.keys(map).sort((a,b)=>b.localeCompare(a)).map(date=>({date, items:map[date]}));
+  }
+
+  function renderSales(){
+    const list = $("#salesList");
+    if(sales.length===0){
+      list.innerHTML = '<div class="empty-state"><span class="emoji">🧁</span><span class="msg">ما فيه مبيعات مسجّلة بعد<br>اضغط "＋ تسجيل بيعة" للبدء</span></div>';
+      return;
+    }
+    const groups = groupByDate(sales);
+    list.innerHTML = groups.map(g=>{
+      const dayTotal = g.items.reduce((a,s)=>a+s.total,0);
+      const rows = g.items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(s=>{
+        const isCustom = s.orderType==="custom";
+        const title = (isCustom?"🎁 ":"") + escapeHtml(s.productName) + (isCustom ? "" : " × "+s.qty);
+        const sub = isCustom
+          ? (s.client ? "لصالح: "+escapeHtml(s.client) : "طلبية خاصة") + (s.qty>1 ? " · "+s.qty+" قطعة" : "")
+          : "سعر القطعة "+fmt(s.price);
+        return `
+        <div class="entry-row">
+          <div class="entry-main">
+            <div class="entry-title">${title}</div>
+            <div class="entry-sub">${sub}</div>
+          </div>
+          <div class="entry-amount sale">${fmt(s.total)}</div>
+          <div class="entry-actions">
+            <button class="icon-btn" data-edit-sale="${s.id}">✏️</button>
+            <button class="icon-btn" data-del-sale="${s.id}">🗑️</button>
+          </div>
+        </div>
+      `;}).join("");
+      return `<div class="day-group">
+        <div class="day-header"><span>${fmtDateHeading(g.date)}</span><span class="total">${fmt(dayTotal)}</span></div>
+        ${rows}
+      </div>`;
+    }).join("");
+  }
+
+  function renderExpenses(){
+    const list = $("#expensesList");
+    if(expenses.length===0){
+      list.innerHTML = '<div class="empty-state"><span class="emoji">🧾</span><span class="msg">ما فيه مصروفات مسجّلة بعد<br>اضغط "＋ تسجيل مصروف" للبدء</span></div>';
+      return;
+    }
+    const groups = groupByDate(expenses);
+    list.innerHTML = groups.map(g=>{
+      const dayTotal = g.items.reduce((a,e)=>a+e.value,0);
+      const rows = g.items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(e=>`
+        <div class="entry-row">
+          <div class="entry-main">
+            <div class="entry-title">${escapeHtml(e.type)}</div>
+            <div class="entry-sub">${escapeHtml(e.desc||"—")}</div>
+          </div>
+          <div class="entry-amount expense">${fmt(e.value)}</div>
+          <div class="entry-actions">
+            <button class="icon-btn" data-edit-expense="${e.id}">✏️</button>
+            <button class="icon-btn" data-del-expense="${e.id}">🗑️</button>
+          </div>
+        </div>
+      `).join("");
+      return `<div class="day-group">
+        <div class="day-header"><span>${fmtDateHeading(g.date)}</span><span class="total">${fmt(dayTotal)}</span></div>
+        ${rows}
+      </div>`;
+    }).join("");
+  }
+
+  function renderProducts(){
+    const list = $("#productsList");
+    if(products.length===0){
+      list.innerHTML = '<div class="empty-state"><span class="emoji">🎂</span><span class="msg">ما فيه أصناف مضافة بعد</span></div>';
+      return;
+    }
+    const cats = {};
+    products.forEach(p=>{ (cats[p.category||"أخرى"] = cats[p.category||"أخرى"] || []).push(p); });
+    list.innerHTML = Object.keys(cats).map(cat=>{
+      const rows = cats[cat].map(p=>`
+        <div class="product-row">
+          <div class="entry-main">
+            <div class="product-name">${escapeHtml(p.name)}</div>
+            <div class="product-meta">تكلفة القطعة ${fmt(p.cost)} · هامش ${fmt(p.price-p.cost)}</div>
+          </div>
+          <div class="product-price">${fmt(p.price)}</div>
+          <div class="entry-actions">
+            <button class="icon-btn" data-edit-product="${p.id}">✏️</button>
+            <button class="icon-btn" data-del-product="${p.id}">🗑️</button>
+          </div>
+        </div>
+      `).join("");
+      return `<div class="category-group"><div class="category-title">${escapeHtml(cat)}</div>${rows}</div>`;
+    }).join("");
+  }
+
+  // ---------- Bottom sheet forms ----------
+  const overlay = $("#overlay");
+  const sheet = $("#sheet");
+
+  function closeSheet(){
+    overlay.classList.remove("show");
+    sheet.classList.remove("show");
+    setTimeout(()=>{ sheet.innerHTML=""; formType=null; editId=null; }, 200);
+  }
+  overlay.addEventListener("click", closeSheet);
+
+  function openSheet(html){
+    sheet.innerHTML = html;
+    overlay.classList.add("show");
+    requestAnimationFrame(()=> sheet.classList.add("show"));
+  }
+
+  function productOptionsHtml(selectedId){
+    return products.map(p=>`<option value="${p.id}" ${p.id===selectedId?"selected":""}>${escapeHtml(p.name)} — ${fmt(p.price)}</option>`).join("");
+  }
+
+  function openSaleForm(id){
+    formType = "sale"; editId = id||null;
+    const existing = id ? sales.find(s=>s.id===id) : null;
+    const initialType = existing ? (existing.orderType||"retail") : "retail";
+    const date = existing ? existing.date : todayStr();
+    const qty = existing ? existing.qty : 1;
+    const selectedProduct = (existing && initialType==="retail") ? products.find(p=>p.name===existing.productName) : products[0];
+
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>${existing ? "تعديل عملية بيع" : "تسجيل بيعة جديدة"}</h3>
+      <div class="segmented" id="saleTypeSeg" style="margin-bottom:16px;">
+        <button type="button" data-stype="retail" class="${initialType==='retail'?'active':''}">🧁 بيع منتج</button>
+        <button type="button" data-stype="custom" class="${initialType==='custom'?'active':''}">🎁 طلبية خاصة</button>
+      </div>
+
+      <div id="retailFields" class="${initialType==='custom'?'hidden':''}">
+        <div class="field"><label>التاريخ</label><input type="date" id="f-date" value="${date}"></div>
+        <div class="field"><label>الصنف</label><select id="f-product">${productOptionsHtml(selectedProduct?selectedProduct.id:null)}</select></div>
+        <div class="field">
+          <label>الكمية</label>
+          <div class="qty-stepper">
+            <button type="button" id="qtyMinus">−</button>
+            <input type="number" id="f-qty" value="${qty}" min="1" step="1">
+            <button type="button" id="qtyPlus">+</button>
+          </div>
+        </div>
+        <div class="live-total"><span>الإجمالي</span><span id="liveTotal">0.000 ر.ع</span></div>
+      </div>
+
+      <div id="customFields" class="${initialType==='custom'?'':'hidden'}">
+        <div class="field"><label>التاريخ</label><input type="date" id="f-date-c" value="${date}"></div>
+        <div class="field"><label>الجهة / العميل (اختياري)</label><input type="text" id="f-client" placeholder="مثال: كافيه X" value="${existing&&existing.client?escapeHtml(existing.client):''}"></div>
+        <div class="field"><label>وصف الطلبية</label><input type="text" id="f-desc-c" placeholder="مثال: 10 كيك تشيزكيك موسمي" value="${existing&&initialType==='custom'?escapeHtml(existing.productName||''):''}"></div>
+        <div class="field"><label>الكمية</label><input type="number" id="f-qty-c" min="1" step="1" value="${existing&&initialType==='custom'?existing.qty:1}"></div>
+        <div class="field"><label>المبلغ الإجمالي (ر.ع)</label><input type="number" id="f-total-c" min="0" step="0.001" value="${existing&&initialType==='custom'?existing.total:''}"></div>
+        <div class="field"><label>تكلفة تقديرية (اختياري، ر.ع)</label><input type="number" id="f-cost-c" min="0" step="0.001" value="${existing&&initialType==='custom'?existing.costTotal:''}"></div>
+      </div>
+
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" id="cancelBtn">إلغاء</button>
+        <button class="btn btn-primary" id="saveSaleBtn">${existing?"حفظ التعديل":"حفظ"}</button>
+      </div>
+      ${existing ? '<button class="btn btn-danger" id="deleteFromFormBtn" style="width:100%;margin-top:10px;">حذف هذه العملية</button>' : ""}
+    `);
+
+    let saleType = initialType;
+    $("#saleTypeSeg").addEventListener("click", (e)=>{
+      const btn = e.target.closest("button[data-stype]");
+      if(!btn) return;
+      saleType = btn.dataset.stype;
+      $all("button[data-stype]", $("#saleTypeSeg")).forEach(b=>b.classList.toggle("active", b===btn));
+      $("#retailFields").classList.toggle("hidden", saleType!=="retail");
+      $("#customFields").classList.toggle("hidden", saleType!=="custom");
+    });
+
+    const updateLive = ()=>{
+      const pid = $("#f-product").value;
+      const p = products.find(x=>x.id===pid);
+      const q = Number($("#f-qty").value)||0;
+      $("#liveTotal").textContent = fmt((p?p.price:0)*q);
+    };
+    updateLive();
+    $("#f-product").addEventListener("change", updateLive);
+    $("#f-qty").addEventListener("input", updateLive);
+    $("#qtyMinus").addEventListener("click", ()=>{ const el=$("#f-qty"); el.value=Math.max(1,(Number(el.value)||1)-1); updateLive(); });
+    $("#qtyPlus").addEventListener("click", ()=>{ const el=$("#f-qty"); el.value=(Number(el.value)||0)+1; updateLive(); });
+    $("#cancelBtn").addEventListener("click", closeSheet);
+
+    $("#saveSaleBtn").addEventListener("click", async ()=>{
+      let rec;
+      if(saleType==="retail"){
+        const pid = $("#f-product").value;
+        const p = products.find(x=>x.id===pid);
+        if(!p) return;
+        const q = Math.max(1, Number($("#f-qty").value)||1);
+        const d = $("#f-date").value || todayStr();
+        rec = {
+          id: existing ? existing.id : uid(),
+          date: d,
+          orderType: "retail",
+          productId: p.id,
+          productName: p.name,
+          qty: q,
+          price: p.price,
+          cost: p.cost,
+          total: +(q*p.price).toFixed(3),
+          costTotal: +(q*p.cost).toFixed(3),
+          profit: +(q*(p.price-p.cost)).toFixed(3),
+          createdAt: existing ? existing.createdAt : Date.now()
+        };
+      } else {
+        const desc = $("#f-desc-c").value.trim();
+        if(!desc){ $("#f-desc-c").focus(); return; }
+        const total = Number($("#f-total-c").value);
+        if(!total || total<=0){ $("#f-total-c").focus(); return; }
+        const q = Math.max(1, Number($("#f-qty-c").value)||1);
+        const costTotal = Number($("#f-cost-c").value)||0;
+        const d = $("#f-date-c").value || todayStr();
+        rec = {
+          id: existing ? existing.id : uid(),
+          date: d,
+          orderType: "custom",
+          client: $("#f-client").value.trim(),
+          productId: null,
+          productName: desc,
+          qty: q,
+          price: +(total/q).toFixed(3),
+          cost: +(costTotal/q).toFixed(3),
+          total: +total.toFixed(3),
+          costTotal: +costTotal.toFixed(3),
+          profit: +(total-costTotal).toFixed(3),
+          createdAt: existing ? existing.createdAt : Date.now()
+        };
+      }
+      if(existing){
+        const idx = sales.findIndex(s=>s.id===existing.id);
+        sales[idx] = rec;
+      } else {
+        sales.push(rec);
+      }
+      await saveSales();
+      closeSheet();
+      render();
+    });
+
+    if(existing){
+      $("#deleteFromFormBtn").addEventListener("click", async ()=>{
+        if(!confirm("تأكيد حذف هذه العملية؟")) return;
+        sales = sales.filter(s=>s.id!==existing.id);
+        await saveSales();
+        closeSheet();
+        render();
+      });
+    }
+  }
+
+  function openExpenseForm(id){
+    formType = "expense"; editId = id||null;
+    const existing = id ? expenses.find(e=>e.id===id) : null;
+    const date = existing ? existing.date : todayStr();
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>${existing ? "تعديل مصروف" : "تسجيل مصروف جديد"}</h3>
+      <div class="field"><label>التاريخ</label><input type="date" id="f-date" value="${date}"></div>
+      <div class="field"><label>نوع المصروف</label>
+        <select id="f-type">
+          ${EXPENSE_TYPES.map(t=>`<option value="${t}" ${existing&&existing.type===t?"selected":""}>${t}</option>`).join("")}
+        </select>
+      </div>
+      <div class="field"><label>البيان</label><input type="text" id="f-desc" placeholder="مثال: فاتورة كهرباء شهر أغسطس" value="${existing?escapeHtml(existing.desc||""):""}"></div>
+      <div class="field"><label>القيمة (ر.ع)</label><input type="number" id="f-value" min="0" step="0.001" value="${existing?existing.value:""}"></div>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" id="cancelBtn">إلغاء</button>
+        <button class="btn btn-primary" id="saveExpenseBtn">${existing?"حفظ التعديل":"حفظ"}</button>
+      </div>
+      ${existing ? '<button class="btn btn-danger" id="deleteFromFormBtn" style="width:100%;margin-top:10px;">حذف هذا المصروف</button>' : ""}
+    `);
+    $("#cancelBtn").addEventListener("click", closeSheet);
+    $("#saveExpenseBtn").addEventListener("click", async ()=>{
+      const val = Number($("#f-value").value);
+      if(!val || val<=0){ $("#f-value").focus(); return; }
+      const rec = {
+        id: existing ? existing.id : uid(),
+        date: $("#f-date").value || todayStr(),
+        type: $("#f-type").value,
+        desc: $("#f-desc").value.trim(),
+        value: +val.toFixed(3),
+        createdAt: existing ? existing.createdAt : Date.now()
+      };
+      if(existing){
+        const idx = expenses.findIndex(e=>e.id===existing.id);
+        expenses[idx] = rec;
+      } else {
+        expenses.push(rec);
+      }
+      await saveExpenses();
+      closeSheet();
+      render();
+    });
+    if(existing){
+      $("#deleteFromFormBtn").addEventListener("click", async ()=>{
+        if(!confirm("تأكيد حذف هذا المصروف؟")) return;
+        expenses = expenses.filter(e=>e.id!==existing.id);
+        await saveExpenses();
+        closeSheet();
+        render();
+      });
+    }
+  }
+
+  function openProductForm(id){
+    formType = "product"; editId = id||null;
+    const existing = id ? products.find(p=>p.id===id) : null;
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>${existing ? "تعديل صنف" : "إضافة صنف جديد"}</h3>
+      <div class="field"><label>اسم المنتج</label><input type="text" id="f-name" value="${existing?escapeHtml(existing.name):""}" placeholder="مثال: تشيزكيك لوتس"></div>
+      <div class="field"><label>الفئة</label>
+        <input type="text" id="f-cat" list="cat-list" value="${existing?escapeHtml(existing.category||""):""}" placeholder="اختر أو اكتب فئة جديدة">
+        <datalist id="cat-list">${DEFAULT_CATEGORIES.map(c=>`<option value="${c}">`).join("")}</datalist>
+      </div>
+      <div class="field"><label>سعر البيع (ر.ع)</label><input type="number" id="f-price" min="0" step="0.001" value="${existing?existing.price:""}"></div>
+      <div class="field"><label>تكلفة القطعة (ر.ع)</label><input type="number" id="f-cost" min="0" step="0.001" value="${existing?existing.cost:""}"></div>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" id="cancelBtn">إلغاء</button>
+        <button class="btn btn-primary" id="saveProductBtn">${existing?"حفظ التعديل":"حفظ"}</button>
+      </div>
+      ${existing ? '<button class="btn btn-danger" id="deleteFromFormBtn" style="width:100%;margin-top:10px;">حذف هذا الصنف</button>' : ""}
+    `);
+    $("#cancelBtn").addEventListener("click", closeSheet);
+    $("#saveProductBtn").addEventListener("click", async ()=>{
+      const name = $("#f-name").value.trim();
+      if(!name){ $("#f-name").focus(); return; }
+      const rec = {
+        id: existing ? existing.id : uid(),
+        name,
+        category: $("#f-cat").value.trim() || "أخرى",
+        price: +(Number($("#f-price").value)||0).toFixed(3),
+        cost: +(Number($("#f-cost").value)||0).toFixed(3)
+      };
+      if(existing){
+        const idx = products.findIndex(p=>p.id===existing.id);
+        products[idx] = rec;
+      } else {
+        products.push(rec);
+      }
+      await saveProducts();
+      closeSheet();
+      render();
+    });
+    if(existing){
+      $("#deleteFromFormBtn").addEventListener("click", async ()=>{
+        if(!confirm("تأكيد حذف هذا الصنف؟ (لن يؤثر على المبيعات السابقة)")) return;
+        products = products.filter(p=>p.id!==existing.id);
+        await saveProducts();
+        closeSheet();
+        render();
+      });
+    }
+  }
+
+  function openBackupSheet(){
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>الإعدادات والنسخ الاحتياطي</h3>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin:-6px 0 18px;">بياناتك محفوظة في مستودعك على GitHub. تقدر كذلك تنزّل نسخة محلية إضافية.</p>
+      <button class="btn btn-primary" id="exportBtn" style="width:100%;margin-bottom:10px;">⬇️ تنزيل نسخة احتياطية</button>
+      <label class="btn btn-secondary" style="width:100%;display:block;text-align:center;cursor:pointer;margin-bottom:10px;">
+        ⬆️ استيراد نسخة احتياطية
+        <input type="file" id="importFile" accept="application/json" style="display:none;">
+      </label>
+      <button class="btn btn-secondary" id="changeGhBtn" style="width:100%;">🔌 تغيير ربط GitHub</button>
+    `);
+    $("#changeGhBtn").addEventListener("click", ()=>{
+      if(confirm("بيسجّل خروجك من هذا الربط بس على هذا الجهاز — بياناتك الحالية باقية بمستودعك على GitHub زي ماهي. تقدر تربط حساب أو مستودع ثاني بعدها. متابعة؟")){
+        clearGhConfig();
+        location.reload();
+      }
+    });
+    $("#exportBtn").addEventListener("click", ()=>{
+      const data = {products, sales, expenses, exportedAt:new Date().toISOString()};
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "cakeyard-backup-"+todayStr()+".json";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    });
+    $("#importFile").addEventListener("change", (e)=>{
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async ()=>{
+        try{
+          const data = JSON.parse(reader.result);
+          if(!confirm("استيراد هذه النسخة سيستبدل كل البيانات الحالية. متابعة؟")) return;
+          if(Array.isArray(data.products)) products = data.products;
+          if(Array.isArray(data.sales)) sales = data.sales;
+          if(Array.isArray(data.expenses)) expenses = data.expenses;
+          await persist();
+          closeSheet();
+          render();
+        }catch(err){
+          alert("تعذّر قراءة الملف، تأكد أنه نسخة احتياطية صحيحة");
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  // ---------- Event delegation ----------
+  document.addEventListener("click", (e)=>{
+    const navBtn = e.target.closest("nav.bottom-nav button");
+    if(navBtn){ switchTab(navBtn.dataset.tab); return; }
+
+    const segBtn = e.target.closest("#periodSeg button");
+    if(segBtn){
+      currentPeriod = segBtn.dataset.period;
+      $all("#periodSeg button").forEach(b=>b.classList.toggle("active", b===segBtn));
+      $("#monthPickerWrap").style.display = currentPeriod==="month" ? "block" : "none";
+      renderDashboard();
+      return;
+    }
+
+    if(e.target.closest("#backupBtn")){ openBackupSheet(); return; }
+    if(e.target.closest("#addSaleBtn")){ openSaleForm(null); return; }
+    if(e.target.closest("#addExpenseBtn")){ openExpenseForm(null); return; }
+    if(e.target.closest("#addProductBtn")){ openProductForm(null); return; }
+
+    const editSale = e.target.closest("[data-edit-sale]");
+    if(editSale){ openSaleForm(editSale.dataset.editSale); return; }
+    const delSale = e.target.closest("[data-del-sale]");
+    if(delSale){
+      if(confirm("تأكيد حذف هذه البيعة؟")){
+        sales = sales.filter(s=>s.id!==delSale.dataset.delSale);
+        saveSales().then(render);
+      }
+      return;
+    }
+
+    const editExpense = e.target.closest("[data-edit-expense]");
+    if(editExpense){ openExpenseForm(editExpense.dataset.editExpense); return; }
+    const delExpense = e.target.closest("[data-del-expense]");
+    if(delExpense){
+      if(confirm("تأكيد حذف هذا المصروف؟")){
+        expenses = expenses.filter(x=>x.id!==delExpense.dataset.delExpense);
+        saveExpenses().then(render);
+      }
+      return;
+    }
+
+    const editProduct = e.target.closest("[data-edit-product]");
+    if(editProduct){ openProductForm(editProduct.dataset.editProduct); return; }
+    const delProduct = e.target.closest("[data-del-product]");
+    if(delProduct){
+      if(confirm("تأكيد حذف هذا الصنف؟")){
+        products = products.filter(p=>p.id!==delProduct.dataset.delProduct);
+        saveProducts().then(render);
+      }
+      return;
+    }
+  });
+
+  // ---------- Setup / lock / connect flow ----------
+  function showSetupError(msg){
+    const el = $("#setupError");
+    el.textContent = msg;
+    el.style.display = "block";
+  }
+
+  function wireSetupScreen(prefill){
+    if(prefill){
+      $("#s-owner").value = prefill.owner||"";
+      $("#s-repo").value = prefill.repo||"";
+      $("#s-branch").value = prefill.branch||"main";
+      $("#s-path").value = prefill.path||"cakeyard-data.json";
+    }
+    $("#setupScreen").classList.remove("hidden");
+    const btn = $("#setupSubmit");
+    const handler = async ()=>{
+      const cfg = {
+        owner: $("#s-owner").value.trim(),
+        repo: $("#s-repo").value.trim(),
+        branch: $("#s-branch").value.trim() || "main",
+        path: $("#s-path").value.trim() || "cakeyard-data.json",
+        token: $("#s-token").value.trim()
+      };
+      if(!cfg.owner || !cfg.repo || !cfg.token){
+        showSetupError("عبّي اسم المستخدم والمستودع والتوكن على الأقل");
+        return;
+      }
+      btn.textContent = "جاري الاختبار...";
+      const prevConfig = ghConfig;
+      ghConfig = cfg;
+      try{
+        await ghGetFile();
+        const pin = prompt("حط رمز دخول قصير لهذا الجهاز (اختياري — اضغط إلغاء للتخطي):");
+        if(pin) cfg.pin = pin;
+        saveGhConfig(cfg);
+        btn.removeEventListener("click", handler);
+        $("#setupScreen").classList.add("hidden");
+        connectAndStart();
+      }catch(err){
+        ghConfig = prevConfig;
+        showSetupError("تعذر الاتصال — تأكد من اسم المستخدم والمستودع والتوكن وصلاحياته. ("+err.message+")");
+        btn.textContent = "ربط واختبار الاتصال";
+      }
+    };
+    btn.addEventListener("click", handler);
+  }
+
+  function showPinScreen(){
+    $("#pinScreen").classList.remove("hidden");
+    const input = $("#pinInput");
+    const err = $("#pinError");
+    input.value = "";
+    err.style.display = "none";
+    setTimeout(()=>input.focus(), 50);
+    const check = ()=>{
+      if(input.value === ghConfig.pin){
+        $("#pinScreen").classList.add("hidden");
+        connectAndStart();
+      } else {
+        err.style.display = "block";
+        input.value = "";
+      }
+    };
+    $("#pinSubmit").onclick = check;
+    input.onkeydown = (e)=>{ if(e.key==="Enter") check(); };
+  }
+
+  async function connectAndStart(){
+    $("#loading .txt").textContent = "جاري الاتصال بـ GitHub…";
+    $("#loading").classList.remove("hidden");
+    try{
+      await loadAll();
+    }catch(err){
+      $("#loading").classList.add("hidden");
+      alert("تعذر الاتصال بـ GitHub لجلب بياناتك: "+err.message+"\nحدّث بيانات الربط وحاول مرة ثانية.");
+      wireSetupScreen(ghConfig);
+      return;
+    }
+    $("#headerDate").textContent = fmtHeaderToday();
+    $("#monthPicker").value = currentMonth;
+    $("#monthPicker").addEventListener("change", ()=>{
+      currentMonth = $("#monthPicker").value || currentMonth;
+      renderDashboard();
+    });
+    $("#loading").classList.add("hidden");
+    $("#app").classList.remove("hidden");
+    render();
+  }
+
+  function init(){
+    ghConfig = loadGhConfig();
+    if(!ghConfig){
+      wireSetupScreen(null);
+      return;
+    }
+    if(ghConfig.pin){
+      showPinScreen();
+      return;
+    }
+    connectAndStart();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
