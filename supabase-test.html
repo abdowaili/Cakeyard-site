@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Cakeyard | نظام التشغيل والإدارة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --purple:#5B2C83; --purple-dark:#3E1D5C; --purple-light:#F1EAF8;
+    --gold:#CE9B44; --gold-light:#FBF1DE;
+    --bg:#FBF8F4; --card:#FFFFFF; --ink:#2B2233; --muted:#8A7E96; --border:#EBE2F2;
+    --green:#3F7D58; --green-light:#EAF4EE; --red:#B94A48; --red-light:#FBEAE9;
+    --blue:#2C5A82; --blue-light:#E8F0F8;
+    --radius:16px; --radius-sm:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh;}
+  #app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative;padding-bottom:72px;}
+  .hidden{display:none !important;}
+  header{position:sticky;top:0;z-index:20;background:var(--purple);color:#fff;padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(91,44,131,0.18);}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;}
+  .brand .emoji{font-size:22px;}
+  header .date-today{font-size:12.5px;color:#E9DBF5;font-weight:500;}
+  main{flex:1;padding:16px 16px 8px;}
+  .segmented{display:flex;background:var(--purple-light);border-radius:999px;padding:4px;margin-bottom:16px;}
+  .segmented button{flex:1;border:none;background:transparent;padding:9px 4px;font-family:inherit;font-size:13px;font-weight:700;color:var(--purple);border-radius:999px;cursor:pointer;}
+  .segmented button.active{background:var(--purple);color:#fff;}
+  .hero-card{background:linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);border-radius:var(--radius);padding:20px 20px 18px;color:#fff;margin-bottom:12px;}
+  .hero-card .label{font-size:13px;color:#DCC7EE;font-weight:600;margin-bottom:4px;}
+  .hero-card .value{font-size:32px;font-weight:900;line-height:1.2;}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:13px 14px;}
+  .stat-card .icon{font-size:18px;margin-bottom:6px;display:block;}
+  .stat-card .label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:3px;}
+  .stat-card .value{font-size:16px;font-weight:800;}
+  .stat-card.expense .value{color:var(--red);}
+  .stat-card.qty .value{color:var(--purple);}
+  .section-title{font-size:15px;font-weight:800;margin:6px 0 10px;display:flex;align-items:center;gap:6px;}
+  .top-products{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 14px 6px;margin-bottom:16px;}
+  .top-row{margin-bottom:12px;}
+  .top-row .top-row-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+  .top-row .top-row-head .name{font-weight:700;}
+  .top-row .top-row-head .qty{color:var(--muted);font-weight:600;}
+  .bar-track{height:8px;background:var(--purple-light);border-radius:6px;overflow:hidden;}
+  .bar-fill{height:100%;background:linear-gradient(90deg, var(--gold), var(--purple));border-radius:6px;}
+  .tab-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .tab-header-row h2{font-size:18px;font-weight:800;margin:0;}
+  .btn-add{background:var(--gold);color:#fff;border:none;border-radius:999px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 3px 8px rgba(206,155,68,0.35);}
+  .btn-add:active{transform:scale(0.97);}
+  .search-box{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:999px;font-family:inherit;font-size:14px;margin-bottom:12px;background:#fff;color:var(--ink);}
+  .search-box:focus{outline:none;border-color:var(--purple);}
+  .day-group{margin-bottom:16px;}
+  .day-header{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);font-weight:700;padding:0 4px 8px;border-bottom:1px dashed var(--border);margin-bottom:8px;}
+  .day-header .total{color:var(--purple);font-weight:800;}
+  .entry-row{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;}
+  .entry-main{flex:1;min-width:0;}
+  .entry-title{font-weight:700;font-size:14px;}
+  .entry-sub{font-size:12px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .entry-amount{font-weight:800;font-size:14.5px;white-space:nowrap;}
+  .entry-amount.sale{color:var(--green);}
+  .entry-amount.expense{color:var(--red);}
+  .entry-actions{display:flex;gap:2px;flex-shrink:0;}
+  .icon-btn{background:none;border:none;font-size:15px;padding:5px 6px;cursor:pointer;border-radius:8px;opacity:0.8;}
+  .icon-btn:active{background:var(--purple-light);}
+  .category-group{margin-bottom:18px;}
+  .category-title{font-size:13px;font-weight:800;color:var(--purple);margin-bottom:8px;padding:0 4px;}
+  .product-row{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;gap:8px;}
+  .product-name{font-weight:700;font-size:14.5px;}
+  .product-meta{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .product-price{font-weight:800;font-size:14.5px;color:var(--purple);white-space:nowrap;}
+  .empty-state{text-align:center;padding:40px 20px;color:var(--muted);}
+  .empty-state .emoji{font-size:36px;display:block;margin-bottom:10px;}
+  .empty-state .msg{font-size:13.5px;font-weight:600;}
+  nav.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);display:flex;z-index:30;padding:6px 0 8px;}
+  nav.bottom-nav button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:inherit;color:var(--muted);padding:6px 0;cursor:pointer;}
+  nav.bottom-nav button .nav-icon{font-size:18px;}
+  nav.bottom-nav button .nav-label{font-size:10px;font-weight:700;}
+  nav.bottom-nav button.active{color:var(--purple);}
+  .overlay{position:fixed;inset:0;background:rgba(43,34,51,0.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s ease;}
+  .overlay.show{opacity:1;pointer-events:auto;}
+  .sheet{position:fixed;bottom:0;left:50%;transform:translate(-50%, 100%);width:100%;max-width:480px;background:#fff;border-radius:20px 20px 0 0;z-index:41;padding:18px 20px calc(20px + env(safe-area-inset-bottom));transition:transform .25s ease;max-height:88vh;overflow-y:auto;}
+  .sheet.show{transform:translate(-50%, 0);}
+  .sheet-handle{width:38px;height:4px;background:var(--border);border-radius:3px;margin:0 auto 14px;}
+  .sheet h3{font-size:17px;font-weight:800;margin:0 0 16px;text-align:center;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;}
+  .field input, .field select{width:100%;font-family:inherit;font-size:15px;padding:11px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);background:#fff;color:var(--ink);}
+  .field input:focus, .field select:focus{outline:none;border-color:var(--purple);}
+  .qty-stepper{display:flex;align-items:center;gap:8px;}
+  .qty-stepper button{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border);background:var(--purple-light);color:var(--purple);font-size:18px;font-weight:800;cursor:pointer;flex-shrink:0;}
+  .qty-stepper input{text-align:center;width:44px;padding:6px;flex-shrink:0;}
+  .live-total{background:var(--gold-light);border-radius:var(--radius-sm);padding:11px 14px;display:flex;justify-content:space-between;font-weight:800;font-size:15px;color:var(--purple-dark);margin-bottom:16px;}
+  .sheet-actions{display:flex;gap:10px;margin-top:4px;}
+  .btn{flex:1;padding:13px;border-radius:12px;border:none;font-family:inherit;font-weight:800;font-size:14px;cursor:pointer;}
+  .btn-primary{background:var(--purple);color:#fff;}
+  .btn-secondary{background:var(--purple-light);color:var(--purple);}
+  .btn-danger{background:var(--red-light);color:var(--red);}
+  .mini-box{border-radius:12px;padding:12px;margin-bottom:14px;}
+  .mini-actions-row{display:flex;gap:8px;margin-bottom:14px;}
+  .mini-actions-row button{flex:1;font-size:12px;padding:10px 4px;}
+  .pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:800;white-space:nowrap;}
+  .pill.new{background:var(--purple-light);color:var(--purple);}
+  .pill.preparing{background:var(--gold-light);color:#8A6416;}
+  .pill.ready{background:var(--blue-light);color:var(--blue);}
+  .pill.delivered{background:var(--green-light);color:var(--green);}
+  .pill.paid{background:var(--green-light);color:var(--green);}
+  .pill.credit{background:var(--red-light);color:var(--red);}
+  .pill.partial{background:var(--gold-light);color:#8A6416;}
+  .fav-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;}
+  .fav-chip{flex-shrink:0;background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;padding:8px 12px;text-align:center;cursor:pointer;min-width:88px;}
+  .fav-chip .nm{font-size:12px;font-weight:700;}
+  .fav-chip .pr{font-size:11px;color:var(--muted);}
+  .items-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;}
+  .item-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:10px;cursor:pointer;position:relative;}
+  .item-card.in-cart{border-color:var(--purple);background:var(--purple-light);}
+  .item-card .nm{font-weight:700;font-size:13px;margin-bottom:3px;}
+  .item-card .pr{font-size:12px;color:var(--muted);}
+  .badge-qty{position:absolute;top:6px;left:6px;background:var(--purple);color:#fff;font-size:10.5px;font-weight:800;border-radius:999px;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px;}
+  .cart-line{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;gap:6px;}
+  .cart-line .name{font-weight:700;font-size:13px;}
+  .cart-line .meta{font-size:11.5px;color:var(--muted);}
+  .cart-line .amt{font-weight:800;font-size:13px;color:var(--purple-dark);white-space:nowrap;}
+  .loading-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;z-index:100;}
+  .loading-screen .emoji{font-size:34px;animation:pulse 1.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.15);opacity:0.6;}}
+  .loading-screen .txt{color:var(--muted);font-weight:700;font-size:13px;}
+  #printView{position:fixed;inset:0;background:#fff;z-index:200;overflow-y:auto;padding:22px 20px;}
+  .inv-header{text-align:center;margin-bottom:18px;}
+  .inv-header .brandname{font-size:21px;font-weight:900;color:var(--purple);}
+  .inv-header .sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .inv-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:14px;border-bottom:1px dashed var(--border);padding-bottom:12px;}
+  .inv-table{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px;}
+  .inv-table th{background:var(--purple-light);color:var(--purple-dark);padding:8px;text-align:right;font-size:11.5px;}
+  .inv-table td{padding:8px;border-bottom:1px solid var(--border);}
+  .inv-total-row{display:flex;justify-content:space-between;font-size:17px;font-weight:900;color:var(--purple);padding-top:8px;}
+  #orderScreen{position:fixed;inset:0;background:var(--bg);z-index:150;display:flex;flex-direction:column;}
+  #orderScreenHead{background:var(--purple);color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+  #orderScreenHead button{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;width:30px;}
+  #orderScreenBody{flex:1;overflow-y:auto;padding:16px;padding-bottom:110px;}
+  #orderScreenFooter{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--border);padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:flex;gap:10px;z-index:151;}
+  @media print{
+    body *{visibility:hidden;}
+    #printView, #printView *{visibility:visible;}
+    #printView{position:absolute;top:0;left:0;width:100%;padding:8mm;}
+    .no-print{display:none !important;}
+  }
+  .pill.overdue{background:var(--red-light);color:var(--red);}
+  .cy-logo{flex-shrink:0;}
+
+  /* ---- Cakeyard Complete: Inventory / Recipes ---- */
+  .menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+  .menu-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 14px;text-align:center;cursor:pointer;box-shadow:0 2px 8px rgba(62,29,92,.04);}
+  .menu-card:active{transform:scale(.98)}
+  .menu-card .mi{font-size:26px;display:block;margin-bottom:7px}.menu-card .mt{font-weight:800;font-size:14px}.menu-card .ms{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .setting-row{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;}
+  .setting-row .st{font-weight:800;font-size:13.5px}.setting-row .ss{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+  .switch{position:relative;width:48px;height:28px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;background:#D8CFDF;border-radius:999px;cursor:pointer;transition:.2s}.slider:before{content:"";position:absolute;width:22px;height:22px;right:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:.2s}.switch input:checked + .slider{background:var(--purple)}.switch input:checked + .slider:before{transform:translateX(-20px)}
+  .stock-row{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px}.stock-row.low{border-color:#E7B9B8;background:#FFF9F8}.stock-row .stock-main{flex:1;min-width:0}.stock-row .stock-name{font-weight:800;font-size:13.5px}.stock-row .stock-sub{font-size:11.5px;color:var(--muted);margin-top:3px}.stock-qty{font-size:15px;font-weight:900;color:var(--purple-dark);white-space:nowrap}.stock-mini-btn{width:34px;height:34px;border:none;border-radius:10px;background:var(--purple-light);color:var(--purple);font-size:18px;font-weight:900;cursor:pointer}.stock-mini-btn.minus{background:var(--red-light);color:var(--red)}
+  .stock-alert{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer}.stock-alert.warn{border-color:#E9C98F;background:#FFFCF6}.stock-alert.danger{border-color:#E7B9B8;background:#FFF9F8}
+  .recipe-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}.recipe-card:active{background:var(--purple-light)}.recipe-name{font-weight:900;font-size:14.5px}.recipe-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.recipe-chip{font-size:10.5px;font-weight:700;background:var(--purple-light);color:var(--purple);border-radius:999px;padding:4px 8px}.recipe-chip.gold{background:var(--gold-light);color:#7B5A18}
+  .recipe-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:8px 0 14px}.recipe-table th{background:var(--purple-light);color:var(--purple-dark);padding:8px;text-align:right}.recipe-table td{padding:8px;border-bottom:1px solid var(--border)}
+  .stage-card{background:#F8F5FA;border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px}.stage-title{font-weight:800;font-size:12.5px;color:var(--purple)}.stage-meta{font-size:12px;color:var(--muted);margin-top:4px}
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .inline-row{display:flex;gap:7px;align-items:center;margin-bottom:8px}.inline-row>*{min-width:0}.inline-row select,.inline-row input{font-family:inherit;padding:9px 8px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--ink)}
+  .scale-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:5px;margin-bottom:12px}.scale-btn{border:1.5px solid var(--border);background:#fff;color:var(--purple);font-family:inherit;font-weight:800;padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}.scale-btn.active{background:var(--purple);color:#fff;border-color:var(--purple)}
+  .muted-box{background:#F8F5FA;border:1px dashed var(--border);border-radius:12px;padding:12px;color:var(--muted);font-size:12.5px;line-height:1.7;margin-bottom:12px}
+  textarea.cy-textarea{width:100%;min-height:100px;font-family:inherit;font-size:14px;padding:11px 12px;border:1.5px solid var(--border);border-radius:10px;resize:vertical;color:var(--ink)}
+  .movement-row{padding:10px 2px;border-bottom:1px dashed var(--border);display:flex;justify-content:space-between;gap:10px}.movement-row .mv-title{font-size:12.5px;font-weight:700}.movement-row .mv-sub{font-size:10.5px;color:var(--muted);margin-top:2px}.movement-row .mv-qty{font-size:12.5px;font-weight:900;white-space:nowrap}.movement-row .mv-qty.pos{color:var(--green)}.movement-row .mv-qty.neg{color:var(--red)}
+
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading-screen hidden">
+  <svg class="cy-logo" width="44" height="44" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="12" fill="#4A2569"/><rect x="10" y="24" width="20" height="8" rx="2.5" fill="#CE9B44"/><rect x="12" y="17" width="16" height="7" rx="2.5" fill="#F1EAF8"/><circle cx="20" cy="11" r="2.4" fill="#CE9B44"/></svg>
+  <span class="txt">جاري تحميل بيانات Cakeyard…</span>
+</div>
+
+<div id="authScreen" class="loading-screen hidden" style="flex-direction:column;padding:28px 22px;gap:12px;text-align:center;overflow-y:auto;">
+  <svg class="cy-logo" width="58" height="58" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="12" fill="#4A2569"/><rect x="10" y="24" width="20" height="8" rx="2.5" fill="#CE9B44"/><rect x="12" y="17" width="16" height="7" rx="2.5" fill="#F1EAF8"/><circle cx="20" cy="11" r="2.4" fill="#CE9B44"/></svg>
+  <div style="font-weight:900;font-size:20px;color:var(--purple);">Cakeyard</div>
+  <div style="font-weight:800;font-size:16px;">تسجيل الدخول</div>
+  <div style="font-size:12.5px;color:var(--muted);max-width:320px;line-height:1.6;">بياناتك محفوظة بشكل آمن في Supabase وتفتح معك من أي جهاز.</div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>البريد الإلكتروني</label><input type="email" id="authEmail" autocomplete="email" placeholder="name@example.com"></div>
+  <div class="field" style="width:100%;max-width:320px;text-align:right;"><label>كلمة المرور</label><input type="password" id="authPassword" autocomplete="current-password" placeholder="••••••••"></div>
+  <button class="btn btn-primary" id="signInBtn" style="width:100%;max-width:320px;">دخول</button>
+  <button class="btn btn-secondary" id="signUpBtn" style="width:100%;max-width:320px;">إنشاء حساب لأول مرة</button>
+  <div id="authError" style="color:var(--red);font-size:12.5px;display:none;max-width:320px;line-height:1.5;"></div>
+  <div id="authInfo" style="color:var(--green);font-size:12.5px;display:none;max-width:320px;line-height:1.5;"></div>
+</div>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="brand"><svg class="cy-logo" width="26" height="26" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"><rect width="40" height="40" rx="12" fill="#4A2569"/><rect x="10" y="24" width="20" height="8" rx="2.5" fill="#CE9B44"/><rect x="12" y="17" width="16" height="7" rx="2.5" fill="#F1EAF8"/><circle cx="20" cy="11" r="2.4" fill="#CE9B44"/></svg> Cakeyard</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span id="syncStatus" style="font-size:11px;color:#DCC7EE;"></span>
+      <div class="date-today" id="headerDate"></div>
+      <button id="backupBtn" aria-label="الإعدادات" style="background:none;border:none;color:#fff;font-size:19px;cursor:pointer;padding:2px 4px;">⚙️</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="tab-dashboard">
+      <div class="hero-card">
+        <div class="label">مبيعات اليوم</div>
+        <div class="value" id="statTodaySales">0.000 ر.ع</div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="icon">🧾</span><div class="label">فواتير اليوم</div><div class="value" id="statTodayCount">0</div></div>
+        <div class="stat-card qty"><span class="icon">📦</span><div class="label">قطع اليوم</div><div class="value" id="statTodayQty">0</div></div>
+        <div class="stat-card expense"><span class="icon">⏳</span><div class="label">إجمالي غير محصّل</div><div class="value" id="statUncollected">0.000 ر.ع</div></div>
+        <div class="stat-card"><span class="icon">📅</span><div class="label">مبيعات الشهر</div><div class="value" id="statMonthTotal">0.000 ر.ع</div></div>
+      </div>
+
+      <button class="btn-add" id="newOrderBtnHome" style="width:100%;font-size:15px;padding:14px;margin-bottom:20px;">＋ طلب جديد</button>
+
+      <div class="section-title">📋 طلبات اليوم</div>
+      <div id="todayOrders" style="margin-bottom:20px;"></div>
+
+      <div class="section-title">🗓️ الطلبات القادمة</div>
+      <div class="segmented" id="upcomingSeg">
+        <button data-upcoming="today">اليوم</button>
+        <button data-upcoming="tomorrow">غدًا</button>
+        <button data-upcoming="week">هذا الأسبوع</button>
+        <button data-upcoming="all" class="active">الكل</button>
+      </div>
+      <div id="upcomingOrders" style="margin-bottom:20px;"></div>
+
+      <div id="inventoryAlertsBlock" class="hidden">
+        <div class="section-title">⚠️ تنبيهات المخزون</div>
+        <div id="inventoryAlerts" style="margin-bottom:20px;"></div>
+      </div>
+
+      <div class="segmented" id="periodSeg">
+        <button data-period="today" class="active">اليوم</button>
+        <button data-period="month">شهر محدد</button>
+        <button data-period="all">كل الفترة</button>
+      </div>
+      <div class="field" id="monthPickerWrap" style="display:none;margin-top:-8px;margin-bottom:16px;"><input type="month" id="monthPicker"></div>
+
+      <div class="section-title">📦 أفضل الأصناف مبيعاً</div>
+      <div class="top-products" id="topProducts"></div>
+      <div id="topCustomersBlock" class="hidden">
+        <div class="section-title">☕ أفضل العملاء</div>
+        <div class="top-products" id="topCustomers"></div>
+      </div>
+    </section>
+
+    <section id="tab-invoices" class="hidden">
+      <div class="tab-header-row"><h2>🧾 الفواتير</h2><button class="btn-add" id="addInvoiceBtn">＋ فاتورة جديدة</button></div>
+      <input type="text" id="invoiceSearch" class="search-box" placeholder="🔍 رقم الفاتورة، العميل، الصنف، أو التاريخ">
+      <div id="invoicesList"></div>
+    </section>
+
+    <section id="tab-customers" class="hidden">
+      <div class="tab-header-row"><h2>👥 العملاء</h2><button class="btn-add" id="addCustomerBtn">＋ عميل جديد</button></div>
+      <div id="customersList"></div>
+    </section>
+
+    <section id="tab-expenses" class="hidden">
+      <div class="tab-header-row"><h2>💸 المصروفات</h2><button class="btn-add" id="addExpenseBtn">＋ تسجيل مصروف</button></div>
+      <div id="expensesList"></div>
+    </section>
+
+    <section id="tab-products" class="hidden">
+      <div class="tab-header-row"><h2>🧁 الأصناف</h2><button class="btn-add" id="addProductBtn">＋ إضافة صنف</button></div>
+      <input type="text" id="productSearch" class="search-box" placeholder="🔍 ابحث عن صنف">
+      <div id="productsList"></div>
+    </section>
+
+    <section id="tab-inventory" class="hidden">
+      <div class="tab-header-row"><h2>📦 المخزون</h2><button class="btn-add" id="addStockBtn">＋ إضافة</button></div>
+      <div class="setting-row">
+        <div><div class="st">خصم المنتج تلقائيًا عند البيع</div><div class="ss">تقدر تفعله أو توقفه بأي وقت. إذا متوقف، البيع ما يغيّر مخزون المنتجات الجاهزة.</div></div>
+        <label class="switch"><input type="checkbox" id="autoDeductSalesToggle"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row" style="margin-bottom:14px;">
+        <div><div class="st">خصم المواد الخام تلقائيًا عند الإنتاج</div><div class="ss">إذا فعلته، تنفيذ وصفة يخصم مكوناتها ويزيد المنتج الجاهز تلقائيًا.</div></div>
+        <label class="switch"><input type="checkbox" id="autoDeductProductionToggle"><span class="slider"></span></label>
+      </div>
+      <div class="segmented" id="inventorySeg">
+        <button data-inventory="finished" class="active">جاهز</button>
+        <button data-inventory="raw">مواد خام</button>
+        <button data-inventory="moves">الحركات</button>
+      </div>
+      <input type="text" id="inventorySearch" class="search-box" placeholder="🔍 ابحث في المخزون">
+      <div id="inventoryList"></div>
+    </section>
+
+    <section id="tab-recipes" class="hidden">
+      <div class="tab-header-row"><h2>📖 الوصفات</h2><button class="btn-add" id="addRecipeBtn">＋ وصفة</button></div>
+      <input type="text" id="recipeSearch" class="search-box" placeholder="🔍 ابحث عن وصفة">
+      <div id="recipesList"></div>
+    </section>
+
+    <section id="tab-more" class="hidden">
+      <div class="tab-header-row"><h2>☰ المزيد</h2></div>
+      <div class="menu-grid">
+        <div class="menu-card" data-more-target="customers"><span class="mi">👥</span><div class="mt">العملاء</div><div class="ms">كافيهات وأفراد وكشوف الحساب</div></div>
+        <div class="menu-card" data-more-target="expenses"><span class="mi">💸</span><div class="mt">المصروفات</div><div class="ms">تسجيل ومراجعة المصاريف</div></div>
+        <div class="menu-card" data-more-target="products"><span class="mi">🧁</span><div class="mt">الأصناف</div><div class="ms">السعر والتكلفة وربط المخزون</div></div>
+        <div class="menu-card" id="moreSettingsBtn"><span class="mi">⚙️</span><div class="mt">الإعدادات</div><div class="ms">نسخ احتياطي وخيارات النظام</div></div>
+      </div>
+      <div class="muted-box">الوصفات والمخزون تبقى داخل النظام لأنها تشغيلية. المحاسبة النهائية وصافي الربح تقدر تكمل مراجعتها في Excel بدون ما نخلي واجهة التطبيق مزدحمة.</div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button data-tab="dashboard" class="active"><span class="nav-icon">🏠</span><span class="nav-label">الرئيسية</span></button>
+    <button data-tab="invoices"><span class="nav-icon">🧾</span><span class="nav-label">الطلبات</span></button>
+    <button data-tab="inventory"><span class="nav-icon">📦</span><span class="nav-label">المخزون</span></button>
+    <button data-tab="recipes"><span class="nav-icon">📖</span><span class="nav-label">الوصفات</span></button>
+    <button data-tab="more"><span class="nav-icon">☰</span><span class="nav-label">المزيد</span></button>
+  </nav>
+</div>
+
+<div class="overlay" id="overlay"></div>
+<div class="sheet" id="sheet"></div>
+
+<div id="orderScreen" class="hidden">
+  <div id="orderScreenHead">
+    <button id="closeOrderBtn">✕</button>
+    <div style="font-weight:800;font-size:15px;" id="orderScreenTitle">طلب جديد</div>
+    <div style="width:24px;"></div>
+  </div>
+  <div id="orderScreenBody"></div>
+  <div id="orderScreenFooter">
+    <button class="btn btn-secondary" id="orderCancelBtn">إلغاء</button>
+    <button class="btn btn-primary" id="orderSaveBtn">حفظ الفاتورة</button>
+  </div>
+</div>
+
+<div id="printView" class="hidden">
+  <div class="no-print" style="display:flex;gap:8px;margin-bottom:16px;">
+    <button class="btn btn-secondary" id="closePrintBtn" style="flex:1;">إغلاق</button>
+    <button class="btn btn-secondary" id="sharePrintBtn" style="flex:1;">📤 مشاركة</button>
+    <button class="btn btn-primary" id="doPrintBtn" style="flex:1;">🖨️ طباعة</button>
+  </div>
+  <div id="printContent"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  "use strict";
+
+  const EXPENSE_TYPES = ["شراء مواد خام","إيجار","كهرباء وماء","تغليف وتعبئة","تسويق وإعلان","نقل وتوصيل","رواتب","صيانة وأدوات","أخرى"];
+  const MATERIAL_TYPE = "شراء مواد خام";
+  const DEFAULT_CATEGORIES = ["كوكيز","تشيزكيك","كيك","براونيز","أخرى"];
+  const ORDER_STATUS_LABELS = {new:"جديد", preparing:"قيد التحضير", ready:"جاهز", delivered:"تم التسليم"};
+  const PAYMENT_STATUS_LABELS = {paid:"مدفوع", credit:"آجل", partial:"مدفوع جزئيًا"};
+  const PAYMENT_METHOD_LABELS = {cash:"كاش", card:"بطاقة", transfer:"تحويل"};
+
+  // Seeds imported from the attached Cakeyard Excel workbook. Current stock starts at 0 on purpose.
+  const SEED_RAW_INVENTORY = [{"id":"rawseed1","name":"طحين (All-purpose flour)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.00032,"location":"","notes":""},{"id":"rawseed2","name":"سكر أبيض (Granulated sugar)","category":"سكريات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.00054,"location":"","notes":""},{"id":"rawseed3","name":"سكر بني (Brown sugar)","category":"سكريات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0016,"location":"","notes":""},{"id":"rawseed4","name":"بودرة سكر (Icing sugar)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.002,"location":"","notes":""},{"id":"rawseed5","name":"كاكاو بودرة (Cocoa powder)","category":"شوكولاتة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.01,"location":"","notes":""},{"id":"rawseed6","name":"بيكنج باودر (Baking powder)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.004090909091,"location":"","notes":""},{"id":"rawseed7","name":"بيكنج صودا (Baking soda)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.003333333333,"location":"","notes":""},{"id":"rawseed8","name":"ملح (Salt)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.000375,"location":"","notes":""},{"id":"rawseed9","name":"نشا ذرة (Cornstarch)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.002,"location":"","notes":""},{"id":"rawseed10","name":"بسكويت (Biscuits)","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0025,"location":"","notes":""},{"id":"rawseed11","name":"زبدة (Butter)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0065,"location":"","notes":""},{"id":"rawseed12","name":"زيت عباد الشمس/ذرة","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.001333333333,"location":"","notes":""},{"id":"rawseed13","name":"بيض (Eggs)","category":"ألبان ودهون وبيض","unit":"piece","qty":0,"minQty":200.0,"unitCost":0.11,"location":"","notes":""},{"id":"rawseed14","name":"حليب سائل (Milk)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0007,"location":"","notes":""},{"id":"rawseed15","name":"كريمة خفق (Cream)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0026,"location":"","notes":""},{"id":"rawseed16","name":"فانيلا سائل (Vanilla extract)","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.007142857143,"location":"","notes":""},{"id":"rawseed17","name":"فانيلا باودر (Vanilla powder)","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.01857142857,"location":"","notes":""},{"id":"rawseed18","name":"شوكولاتة بالحليب","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.008,"location":"","notes":""},{"id":"rawseed19","name":"شوكولاتة بيضاء","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.008,"location":"","notes":""},{"id":"rawseed20","name":"شوكولاتة دارك","category":"شوكولاتة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.008,"location":"","notes":""},{"id":"rawseed21","name":"شوكولاتة شيبس (Chocolate chips)","category":"شوكولاتة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0125,"location":"","notes":""},{"id":"rawseed22","name":"كندر أصابع","category":"شوكولاتة","unit":"piece","qty":0,"minQty":200.0,"unitCost":0.15,"location":"","notes":""},{"id":"rawseed23","name":"جبن كريمي (Cream cheese)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.004242424242,"location":"","notes":""},{"id":"rawseed24","name":"ماسكربوني (Mascarpone)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.034,"location":"","notes":""},{"id":"rawseed25","name":"لوز (Almonds)","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.007,"location":"","notes":""},{"id":"rawseed26","name":"بندق (Hazelnuts)","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.008,"location":"","notes":""},{"id":"rawseed27","name":"فستق (Pistachio)","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.024,"location":"","notes":""},{"id":"rawseed28","name":"جوز (Walnuts)","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.005,"location":"","notes":""},{"id":"rawseed29","name":"فول سوداني","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0024,"location":"","notes":""},{"id":"rawseed30","name":"لوز شرائح","category":"مكسرات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.016,"location":"","notes":""},{"id":"rawseed31","name":"صوص الشوكلت نوتلا","category":"صوصات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0048,"location":"","notes":""},{"id":"rawseed32","name":"صوص كراميل","category":"صوصات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.005,"location":"","notes":""},{"id":"rawseed33","name":"صوص كندر","category":"شوكولاتة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.00875,"location":"","notes":""},{"id":"rawseed34","name":"فراوله مجمدة","category":"فواكه مجمدة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0025,"location":"","notes":""},{"id":"rawseed35","name":"مانجو مجمد","category":"فواكه مجمدة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.002,"location":"","notes":""},{"id":"rawseed36","name":"توت مجمد","category":"فواكه مجمدة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.006,"location":"","notes":""},{"id":"rawseed37","name":"بلوبيري مجمد","category":"فواكه مجمدة","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.007,"location":"","notes":""},{"id":"rawseed38","name":"ماي","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0002,"location":"","notes":""},{"id":"rawseed39","name":"نكهه تشيزكيك","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0065,"location":"","notes":""},{"id":"rawseed40","name":"حليب مكثف","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.001891891892,"location":"","notes":""},{"id":"rawseed41","name":"جلاتين","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.02,"location":"","notes":""},{"id":"rawseed42","name":"زبادي يوناني","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.003333333333,"location":"","notes":""},{"id":"rawseed43","name":"سكر بودرة ديكور","category":"سكريات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.0075,"location":"","notes":""},{"id":"rawseed44","name":"كوكو ديكور","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.02,"location":"","notes":""},{"id":"rawseed45","name":"عسل","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.006,"location":"","notes":""},{"id":"rawseed46","name":"قرفة","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.01,"location":"","notes":""},{"id":"rawseed47","name":"اكياس وعبوات تعبئة","category":"تعبئة وتغليف","unit":"piece","qty":0,"minQty":200.0,"unitCost":0.05,"location":"","notes":""},{"id":"rawseed48","name":"صوص","category":"صوصات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.007,"location":"","notes":""},{"id":"rawseed49","name":"حشوه الكيك","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.005,"location":"","notes":""},{"id":"rawseed50","name":"صوص لوتس","category":"صوصات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.004,"location":"","notes":""},{"id":"rawseed51","name":"صوص الفراوله","category":"صوصات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.006,"location":"","notes":""},{"id":"rawseed52","name":"صوص مانجو","category":"صوصات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.006,"location":"","notes":""},{"id":"rawseed53","name":"صوص بستاشو","category":"صوصات","unit":"gram","qty":0,"minQty":200.0,"unitCost":0.006,"location":"","notes":""},{"id":"rawseed54","name":"ملون طعام","category":"سكريات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.01,"location":"","notes":""},{"id":"rawseed55","name":"بسكوت تراميسو","category":"مكونات جافة وخبيز","unit":"piece","qty":0,"minQty":0.0,"unitCost":0.0375,"location":"","notes":""},{"id":"rawseed56","name":"فروت نسبه عاليه للكيك","category":"نكهات وإضافات","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.005090909091,"location":"","notes":""},{"id":"rawseed57","name":"قهوه حب","category":"مكونات جافة وخبيز","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.015,"location":"","notes":""},{"id":"rawseed58","name":"خل","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0005319148936,"location":"","notes":""},{"id":"rawseed59","name":"زبادي (روب)","category":"ألبان ودهون وبيض","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.001176470588,"location":"","notes":""},{"id":"rawseed60","name":"اسم المنتج","category":"📦 تغليف / علب (ر.ع)","unit":"⚡ كهرباء (ر.ع)","qty":0,"minQty":0,"unitCost":0,"location":"","notes":""},{"id":"rawseed61","name":"سكوب كوكيز","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed62","name":"سان سباستيان","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed63","name":"تشيزكيك مختلف نكهات مطبوخة","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed64","name":"تشيزكيك سادة مطبوخة","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed65","name":"كوكيز كلاسيك","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed66","name":"شوكلت كيك","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed67","name":"فانيليا كيك","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed68","name":"كوكيز محشي","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed69","name":"كيكة شوكلت مع غناش","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed70","name":"كيكه شوكلت ماتيلدا","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed71","name":"براونيز فدج","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed72","name":"براونيز تشوي كيكي","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed73","name":"كوكيز كلاسيك وصفة عبدو","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed74","name":"تشيزكيك بارد","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed75","name":"بوكس رمضان","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed76","name":"كيكة فانيليا مع كريمه بنكهه","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed77","name":"#REF!","category":"أخرى","unit":"gram","qty":0,"minQty":0,"unitCost":0,"location":"","notes":""},{"id":"rawseed78","name":"تشيزكيك بارد ارتفاع اكثر","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed79","name":"تشيزكيك بارد ارتفاع الفراوله","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed80","name":"تشيزكيك بارد ارتفاع لوتس","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed81","name":"تشيزكيك بارد ارتفاع بستاشو","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed82","name":"تشيزكيك بارد ارتفاع مانجو","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed83","name":"كريمه تراميسو","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed84","name":"تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed85","name":"كيك فانيليا ب كريمه الفراوله صينيه فرن","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed86","name":"كيكه شوكلت تحديث","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed87","name":"كيكه فانيليا تحديث","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""},{"id":"rawseed88","name":"دريم كوكيز","category":"أخرى","unit":"gram","qty":0,"minQty":0.0,"unitCost":0.0,"location":"","notes":""}];
+  const SEED_RECIPES = [{"id":"recseed1","name":"سكوب كوكيز","category":"كوكيز","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":660.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":160.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":360.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":8.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":8.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":30.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":440.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":4.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":20.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":200.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"سكوب كوكيز"},{"id":"recseed2","name":"سان سباستيان","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":45.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":300.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":5.0,"unit":"piece"},{"rawName":"كريمة خفق (Cream)","qty":500.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":6.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":1000.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"سان سباستيان"},{"id":"recseed3","name":"تشيزكيك مختلف نكهات مطبوخة","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":17.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":200.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":4.0,"unit":"piece"},{"rawName":"كريمة خفق (Cream)","qty":270.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":730.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":7.0,"unit":"gram"},{"rawName":"نكهه تشيزكيك","qty":350.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":80.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك مختلف نكهات مطبوخة"},{"id":"recseed4","name":"تشيزكيك سادة مطبوخة","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":17.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":200.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":4.0,"unit":"piece"},{"rawName":"كريمة خفق (Cream)","qty":270.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":730.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":7.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":80.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك سادة مطبوخة"},{"id":"recseed5","name":"كوكيز كلاسيك","category":"كوكيز","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":300.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":120.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":100.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":3.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":3.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":15.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":200.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":2.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":6.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":200.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كوكيز كلاسيك"},{"id":"recseed6","name":"دريم كوكيز","category":"كوكيز","moldSize":"","yieldQty":20.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":720.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":120.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":370.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":8.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":8.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":40.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":420.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":17.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":475.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":5.0,"unit":"gram"},{"rawName":"شوكولاتة دارك","qty":280.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":190.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"دريم كوكيز"},{"id":"recseed7","name":"فانيليا كيك","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":440.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":400.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":10.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"زيت عباد الشمس/ذرة","qty":200.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":300.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":16.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"فانيليا كيك"},{"id":"recseed8","name":"كوكيز محشي","category":"كوكيز","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":370.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":95.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":210.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":3.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":5.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":200.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":2.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":6.0,"unit":"gram"},{"rawName":"صوص الشوكلت نوتلا","qty":100.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كوكيز محشي"},{"id":"recseed9","name":"كيكة شوكلت مع غناش","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":373.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":400.0,"unit":"gram"},{"rawName":"كاكاو بودرة (Cocoa powder)","qty":90.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":8.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":4.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"زيت عباد الشمس/ذرة","qty":200.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":330.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":600.0,"unit":"gram"},{"rawName":"شوكولاتة دارك","qty":600.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":10.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كيكة شوكلت مع غناش"},{"id":"recseed10","name":"كيكه شوكلت ماتيلدا","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":300.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":350.0,"unit":"gram"},{"rawName":"كاكاو بودرة (Cocoa powder)","qty":100.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":8.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":4.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"زيت عباد الشمس/ذرة","qty":180.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":4.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":240.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":300.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":300.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":60.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كيكه شوكلت ماتيلدا"},{"id":"recseed11","name":"براونيز فدج","category":"براونيز","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":180.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":400.0,"unit":"gram"},{"rawName":"كاكاو بودرة (Cocoa powder)","qty":60.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":120.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":7.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":300.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":500.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"براونيز فدج"},{"id":"recseed12","name":"كوكيز كلاسيك وصفة عبدو","category":"كوكيز","moldSize":"","yieldQty":20.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":340.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":50.0,"unit":"gram"},{"rawName":"سكر بني (Brown sugar)","qty":190.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":3.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":9.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":200.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":3.0,"unit":"piece"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":8.0,"unit":"gram"},{"rawName":"شوكولاتة بالحليب","qty":200.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كوكيز كلاسيك وصفة عبدو"},{"id":"recseed13","name":"تشيزكيك بارد","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"حليب مكثف","qty":0.0,"unit":"gram"},{"rawName":"بودرة سكر (Icing sugar)","qty":130.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":330.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":10.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":650.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":80.0,"unit":"gram"},{"rawName":"ماي","qty":60.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"نكهه تشيزكيك","qty":200.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد"},{"id":"recseed14","name":"كيكة فانيليا مع كريمه بنكهه","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":373.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":400.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":10.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"زيت عباد الشمس/ذرة","qty":190.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":380.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":550.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":50.0,"unit":"gram"},{"rawName":"بودرة سكر (Icing sugar)","qty":90.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":8.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":130.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"صوص","qty":110.0,"unit":"gram"},{"rawName":"حشوه الكيك","qty":300.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كيكة فانيليا مع كريمه بنكهه"},{"id":"recseed15","name":"تشيزكيك بارد ارتفاع اكثر","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"حليب مكثف","qty":0.0,"unit":"gram"},{"rawName":"بودرة سكر (Icing sugar)","qty":190.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":800.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":100.0,"unit":"gram"},{"rawName":"ماي","qty":80.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"صوص","qty":320.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد ارتفاع اكثر"},{"id":"recseed16","name":"تشيزكيك بارد ارتفاع الفراوله","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"بودرة سكر (Icing sugar)","qty":190.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":800.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":100.0,"unit":"gram"},{"rawName":"ماي","qty":80.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"صوص الفراوله","qty":110.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد ارتفاع الفراوله"},{"id":"recseed17","name":"تشيزكيك بارد ارتفاع مانجو","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"بودرة سكر (Icing sugar)","qty":190.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":800.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":100.0,"unit":"gram"},{"rawName":"ماي","qty":80.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"صوص مانجو","qty":110.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد ارتفاع مانجو"},{"id":"recseed18","name":"تشيزكيك بارد ارتفاع بستاشو","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"بودرة سكر (Icing sugar)","qty":190.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":800.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":100.0,"unit":"gram"},{"rawName":"ماي","qty":80.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"صوص بستاشو","qty":320.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد ارتفاع بستاشو"},{"id":"recseed19","name":"كريمه تراميسو","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"بودرة سكر (Icing sugar)","qty":40.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":530.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":320.0,"unit":"gram"},{"rawName":"حليب مكثف","qty":110.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":6.0,"unit":"gram"},{"rawName":"بسكوت تراميسو","qty":57.0,"unit":"piece"}],"ovenStages":[],"method":"","notes":"","finishedName":"كريمه تراميسو"},{"id":"recseed20","name":"تشيزكيك بارد ارتفاع لوتس","category":"تشيزكيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"حليب مكثف","qty":0.0,"unit":"gram"},{"rawName":"بودرة سكر (Icing sugar)","qty":190.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":12.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":800.0,"unit":"gram"},{"rawName":"جلاتين","qty":12.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":100.0,"unit":"gram"},{"rawName":"ماي","qty":80.0,"unit":"gram"},{"rawName":"زبادي يوناني","qty":150.0,"unit":"gram"},{"rawName":"صوص لوتس","qty":320.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك بارد ارتفاع لوتس"},{"id":"recseed21","name":"تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر","category":"أخرى","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":27.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":300.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":4.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"كريمة خفق (Cream)","qty":420.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":13.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":1138.0,"unit":"gram"},{"rawName":"نشا ذرة (Cornstarch)","qty":13.0,"unit":"gram"},{"rawName":"نكهه تشيزكيك","qty":0.0,"unit":"gram"},{"rawName":"بسكويت (Biscuits)","qty":200.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":108.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر"},{"id":"recseed22","name":"كيكه شوكلت تحديث","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"طحين (All-purpose flour)","qty":400.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":460.0,"unit":"gram"},{"rawName":"كاكاو بودرة (Cocoa powder)","qty":160.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":5.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":13.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":3.0,"unit":"gram"},{"rawName":"زيت عباد الشمس/ذرة","qty":160.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":7.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":200.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":42.0,"unit":"gram"},{"rawName":"قهوه حب","qty":12.0,"unit":"gram"},{"rawName":"ماي","qty":530.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":600.0,"unit":"gram"},{"rawName":"شوكولاتة دارك","qty":600.0,"unit":"gram"},{"rawName":"زبدة (Butter)","qty":15.0,"unit":"gram"},{"rawName":"خل","qty":40.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كيكه شوكلت تحديث"},{"id":"recseed23","name":"كيكه فانيليا تحديث","category":"كيك","moldSize":"","yieldQty":1.0,"yieldUnit":"وحدة","ingredients":[{"rawName":"زبدة (Butter)","qty":210.0,"unit":"gram"},{"rawName":"بيض (Eggs)","qty":6.0,"unit":"piece"},{"rawName":"حليب سائل (Milk)","qty":250.0,"unit":"gram"},{"rawName":"طحين (All-purpose flour)","qty":350.0,"unit":"gram"},{"rawName":"سكر أبيض (Granulated sugar)","qty":360.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"بيكنج باودر (Baking powder)","qty":9.0,"unit":"gram"},{"rawName":"بيكنج صودا (Baking soda)","qty":4.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":20.0,"unit":"gram"},{"rawName":"بودرة سكر (Icing sugar)","qty":90.0,"unit":"gram"},{"rawName":"زبادي (روب)","qty":170.0,"unit":"gram"},{"rawName":"فانيلا سائل (Vanilla extract)","qty":8.0,"unit":"gram"},{"rawName":"جبن كريمي (Cream cheese)","qty":160.0,"unit":"gram"},{"rawName":"ملح (Salt)","qty":5.0,"unit":"gram"},{"rawName":"صوص","qty":110.0,"unit":"gram"},{"rawName":"حشوه الكيك","qty":300.0,"unit":"gram"},{"rawName":"كريمة خفق (Cream)","qty":500.0,"unit":"gram"}],"ovenStages":[],"method":"","notes":"","finishedName":"كيكه فانيليا تحديث"}];
+  const SEED_FINISHED_INVENTORY = [{"id":"finseed1","name":"سكوب كوكيز","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed2","name":"سان سباستيان","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed3","name":"تشيزكيك مختلف نكهات مطبوخة","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed4","name":"تشيزكيك سادة مطبوخة","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed5","name":"كوكيز كلاسيك","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed6","name":"شوكلت كيك","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed7","name":"فانيليا كيك","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed8","name":"كوكيز محشي","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed9","name":"كيكة شوكلت مع غناش","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed10","name":"كيكه شوكلت ماتيلدا","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed11","name":"براونيز فدج","category":"براونيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed12","name":"براونيز تشوي كيكي","category":"براونيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed13","name":"كوكيز كلاسيك وصفة عبدو","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed14","name":"تشيزكيك بارد","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed15","name":"بوكس رمضان","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed16","name":"كيكة فانيليا مع كريمه بنكهه","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed17","name":"تشيزكيك بارد ارتفاع اكثر","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed18","name":"تشيزكيك بارد ارتفاع الفراوله","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed19","name":"تشيزكيك بارد ارتفاع لوتس","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed20","name":"تشيزكيك بارد ارتفاع بستاشو","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed21","name":"تشيزكيك بارد ارتفاع مانجو","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed22","name":"كريمه تراميسو","category":"تشيزكيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed23","name":"تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر","category":"أخرى","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed24","name":"كيك فانيليا ب كريمه الفراوله صينيه فرن","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed25","name":"كيكه شوكلت تحديث","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed26","name":"كيكه فانيليا تحديث","category":"كيك","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""},{"id":"finseed27","name":"دريم كوكيز","category":"كوكيز","unit":"وحدة","qty":0,"minQty":0,"location":"","notes":""}];
+
+  const SEED_PRODUCTS = [
+    ["سكوب كوكيز","كوكيز",10,6.006],["سان سباستيان","تشيزكيك",11,6.313],
+    ["تشيزكيك مختلف نكهات مطبوخة","تشيزكيك",12,7.749],["تشيزكيك سادة مطبوخة","تشيزكيك",10,5.474],
+    ["كوكيز كلاسيك","كوكيز",9,3.525],["شوكلت كيك","كيك",10,2.307],["فانيليا كيك","كيك",9,1.651],
+    ["كوكيز محشي","كوكيز",10,2.579],["كيكة شوكلت مع غناش","كيك",14,8.866],["كيكه شوكلت ماتيلدا","كيك",18,5.751],
+    ["براونيز فدج","براونيز",12,7.873],["براونيز تشوي كيكي","براونيز",10,4.207],
+    ["كوكيز كلاسيك وصفة عبدو","كوكيز",0.5,0.188],["تشيزكيك بارد","تشيزكيك",11,7.019],["بوكس رمضان","كوكيز",5.5,0],
+    ["كيكة فانيليا مع كريمه بنكهه","كيك",12,6.234],["تشيزكيك بارد ارتفاع اكثر","تشيزكيك",12,9.098],
+    ["تشيزكيك بارد ارتفاع الفراوله","تشيزكيك",12,7.518],["تشيزكيك بارد ارتفاع لوتس","تشيزكيك",12,8.138],
+    ["تشيزكيك بارد ارتفاع بستاشو","تشيزكيك",12,8.778],["تشيزكيك بارد ارتفاع مانجو","تشيزكيك",12,7.518],
+    ["تشيزكيك مختلف نكهات مطبوخة ارتفاع اكثر","تشيزكيك",13,8.073],["كيك فانيليا بكريمة الفراولة صينية فرن","كيك",8,8.307]
+  ];
+
+  let products = [];
+  let invoices = [];
+  let expenses = [];
+  let customers = [];
+  let rawInventory = [];
+  let finishedInventory = [];
+  let recipes = [];
+  let stockMovements = [];
+  let appSettings = {autoDeductSales:false, autoDeductProduction:false};
+  let currentTab = "dashboard";
+  let currentPeriod = "today";
+  let upcomingFilter = "all";
+  let inventoryMode = "finished";
+  let currentMonth = "";
+  let currentUser = null;
+  let stateRevision = 0;
+  let persistChain = Promise.resolve();
+  const SUPABASE_URL = "https://qehlbenbqcsqorslbebi.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_PemgVYxH-NWhRcAHJXKYaw_ZQgxAwOa";
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+
+  const $ = (sel, root) => (root||document).querySelector(sel);
+  const $all = (sel, root) => Array.from((root||document).querySelectorAll(sel));
+  const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+  const fmt = (n) => (Number(n)||0).toFixed(3)+" ر.ع";
+  const escapeHtml = (s) => String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  function todayStr(){ const d=new Date(); const off=d.getTimezoneOffset(); return new Date(d.getTime()-off*60000).toISOString().slice(0,10); }
+  function fmtDateHeading(dateStr){ return new Intl.DateTimeFormat("ar", {weekday:"long", day:"numeric", month:"long", numberingSystem:"latn"}).format(new Date(dateStr+"T12:00:00")); }
+  function fmtHeaderToday(){ return new Intl.DateTimeFormat("ar", {weekday:"long", day:"numeric", month:"long", numberingSystem:"latn"}).format(new Date()); }
+  function utf8ToBase64(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function base64ToUtf8(b64){ return decodeURIComponent(escape(atob(b64.replace(/\n/g,"")))); }
+  function seedProducts(){ return SEED_PRODUCTS.map(p => ({id:uid(), name:p[0], category:p[1], price:p[2], cost:p[3]})); }
+  function deepClone(v){ return JSON.parse(JSON.stringify(v)); }
+  function stockLabelUnit(unit){ return unit==="gram"?"جم":unit==="piece"?"حبة":unit==="ml"?"مل":unit==="kg"?"كجم":(unit||"وحدة"); }
+  function movementDateLabel(ts){ try{return new Intl.DateTimeFormat("ar",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",numberingSystem:"latn"}).format(new Date(ts));}catch(e){return "";} }
+  function findFinishedForProduct(productId,name){
+    const p = productId ? products.find(x=>x.id===productId) : null;
+    if(p&&p.stockItemId){ const s=finishedInventory.find(x=>x.id===p.stockItemId); if(s) return s; }
+    return finishedInventory.find(x=>x.name.trim()===String(name||"").trim()) || null;
+  }
+  function findRawByName(name){ return rawInventory.find(x=>x.name.trim()===String(name||"").trim()) || null; }
+  function addMovement(stockType,item,delta,reason,refType,refId){
+    stockMovements.unshift({id:uid(),stockType,itemId:item.id,itemName:item.name,delta:+Number(delta).toFixed(3),unit:item.unit||"وحدة",reason:reason||"تعديل يدوي",refType:refType||"manual",refId:refId||null,createdAt:Date.now()});
+    if(stockMovements.length>800) stockMovements=stockMovements.slice(0,800);
+  }
+  function lowFinished(){ return finishedInventory.filter(x=>x.initialized!==false && Number(x.minQty)>0 && Number(x.qty)<=Number(x.minQty)); }
+  function lowRaw(){ return rawInventory.filter(x=>x.initialized!==false && Number(x.minQty)>0 && Number(x.qty)<=Number(x.minQty)); }
+  function logoSvg(size){
+    return `<svg width="${size}" height="${size}" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle;"><rect width="40" height="40" rx="12" fill="#4A2569"/><rect x="10" y="24" width="20" height="8" rx="2.5" fill="#CE9B44"/><rect x="12" y="17" width="16" height="7" rx="2.5" fill="#F1EAF8"/><circle cx="20" cy="11" r="2.4" fill="#CE9B44"/></svg>`;
+  }
+  function addDays(dateStr, n){ const d = new Date(dateStr+"T12:00:00"); d.setDate(d.getDate()+n); const off=d.getTimezoneOffset(); return new Date(d.getTime()-off*60000).toISOString().slice(0,10); }
+  function relativeLabel(dateStr){
+    const today = todayStr();
+    if(dateStr===today) return "اليوم";
+    if(dateStr===addDays(today,1)) return "غدًا";
+    const diffDays = Math.round((new Date(dateStr+"T12:00:00")-new Date(today+"T12:00:00"))/86400000);
+    if(diffDays>1 && diffDays<7) return new Intl.DateTimeFormat("ar",{weekday:"long", numberingSystem:"latn"}).format(new Date(dateStr+"T12:00:00"));
+    return fmtDateHeading(dateStr);
+  }
+  function isOverdue(inv){ return inv.pickupDate < todayStr() && inv.orderStatus !== "delivered"; }
+  function generateInvoiceNo(dateStr){
+    const ymd = dateStr.replace(/-/g,"").slice(2);
+    let maxSeq = 0;
+    invoices.forEach(inv=>{
+      const m = inv.invoiceNo ? new RegExp("^CY-"+ymd+"-(\\d+)$").exec(inv.invoiceNo) : null;
+      if(m) maxSeq = Math.max(maxSeq, parseInt(m[1],10));
+    });
+    return "CY-"+ymd+"-"+String(maxSeq+1).padStart(2,"0");
+  }
+
+  currentMonth = todayStr().slice(0,7);
+
+  // ---------- Supabase-backed storage ----------
+  function setSyncStatus(state){
+    const el = $("#syncStatus"); if(!el) return;
+    if(state==="saving") el.textContent = "⏳ يحفظ...";
+    else if(state==="synced"){ el.textContent = "✅ محفوظ"; setTimeout(()=>{ if(el.textContent==="✅ محفوظ") el.textContent=""; }, 1800); }
+    else if(state==="error") el.textContent = "⚠️ تعذر الحفظ";
+  }
+  function buildState(){
+    return {products,invoices,expenses,customers,rawInventory,finishedInventory,recipes,stockMovements,appSettings};
+  }
+  function loadStateIntoMemory(d){
+    d = d || {};
+    products = Array.isArray(d.products) ? d.products : [];
+    expenses = Array.isArray(d.expenses) ? d.expenses : [];
+    customers = Array.isArray(d.customers) ? d.customers : [];
+    if(Array.isArray(d.invoices)) invoices = d.invoices;
+    else if(Array.isArray(d.sales)){
+      invoices = d.sales.map(s=>(
+        {id:s.id||uid(),date:s.date,customerId:null,customerName:s.orderType==="custom"?(s.client||""):"",
+         items:[{productId:s.productId||null,name:s.productName,qty:s.qty,price:s.price,cost:s.cost,lineTotal:s.total,lineCost:s.costTotal}],
+         total:s.total,costTotal:s.costTotal,profit:s.profit,paid:true,createdAt:s.createdAt||Date.now()}
+      ));
+    } else invoices=[];
+    rawInventory = Array.isArray(d.rawInventory) ? d.rawInventory : [];
+    finishedInventory = Array.isArray(d.finishedInventory) ? d.finishedInventory : [];
+    recipes = Array.isArray(d.recipes) ? d.recipes : [];
+    stockMovements = Array.isArray(d.stockMovements) ? d.stockMovements : [];
+    appSettings = d.appSettings && typeof d.appSettings==="object" ? {...{autoDeductSales:false,autoDeductProduction:false},...d.appSettings} : {autoDeductSales:false,autoDeductProduction:false};
+  }
+  async function fetchLegacyGithubData(){
+    // One-time migration helper. It silently reuses the old config already stored on this same GitHub Pages origin.
+    let cfg=null;
+    try{ cfg=JSON.parse(localStorage.getItem("cy_gh_config")||"null"); }catch(e){}
+    if(!cfg || !cfg.owner || !cfg.repo || !cfg.path || !cfg.token) return null;
+    try{
+      const url=`https://api.github.com/repos/${encodeURIComponent(cfg.owner)}/${encodeURIComponent(cfg.repo)}/contents/${encodeURIComponent(cfg.path)}?ref=${encodeURIComponent(cfg.branch||"main")}`;
+      const res=await fetch(url,{headers:{"Authorization":"Bearer "+cfg.token,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});
+      if(!res.ok) return null;
+      const j=await res.json();
+      const raw=decodeURIComponent(escape(atob(String(j.content||"").replace(/\n/g,""))));
+      return JSON.parse(raw);
+    }catch(err){ console.warn("Legacy GitHub migration skipped",err); return null; }
+  }
+  function initializeSeeds(){
+    products = seedProducts(); invoices=[]; expenses=[]; customers=[];
+    rawInventory=deepClone(SEED_RAW_INVENTORY).map(x=>({...x,initialized:false}));
+    finishedInventory=deepClone(SEED_FINISHED_INVENTORY).map(x=>({...x,initialized:false}));
+    recipes=deepClone(SEED_RECIPES); stockMovements=[];
+    appSettings={autoDeductSales:false,autoDeductProduction:false};
+    backfillOperationsData({rawInventory,finishedInventory,recipes,stockMovements,appSettings});
+  }
+  async function performPersist(){
+    if(!currentUser) return;
+    setSyncStatus("saving");
+    const snapshot = JSON.parse(JSON.stringify(buildState()));
+    const {data,error} = await sb.rpc("save_cakeyard_state", {p_state:snapshot,p_expected_revision:stateRevision});
+    if(error){
+      console.error("Supabase save failed",error);
+      setSyncStatus("error");
+      if(String(error.message||"").includes("STALE_STATE")){
+        alert("تم تعديل البيانات من جهاز آخر. بنعيد تحميل أحدث نسخة الآن.");
+        await loadAll(); render();
+      } else {
+        alert("تعذر الحفظ في Supabase. تأكد من الإنترنت ثم حاول مرة ثانية.\n"+(error.message||""));
+      }
+      return;
+    }
+    stateRevision=Number(data)||stateRevision+1;
+    setSyncStatus("synced");
+  }
+  function persist(){
+    persistChain = persistChain.then(()=>performPersist()).catch(err=>{console.error(err);setSyncStatus("error");});
+    return persistChain;
+  }
+
+  function backfillInvoiceFields(){
+    let changed = false;
+    let maxSeq = 0;
+    invoices.forEach(i=>{ const m=/CY-(\d+)$/.exec(i.invoiceNo||""); if(m) maxSeq=Math.max(maxSeq, parseInt(m[1],10)); });
+    let seq = maxSeq+1;
+    invoices.slice().sort((a,b)=>(a.createdAt||0)-(b.createdAt||0)).forEach(inv=>{
+      // old-style continuous numbers are preserved as-is; only truly-missing ones get a one-time legacy number.
+      if(!inv.invoiceNo){ inv.invoiceNo = "CY-"+String(seq).padStart(4,"0"); seq++; changed = true; }
+    });
+    invoices.forEach(inv=>{
+      if(inv.paymentStatus===undefined){
+        inv.paymentStatus = inv.paid===false ? "credit" : "paid";
+        inv.amountPaid = inv.paymentStatus==="paid" ? inv.total : 0;
+        delete inv.paid;
+        changed = true;
+      }
+      if(inv.paymentMethod===undefined){ inv.paymentMethod = inv.paymentStatus==="credit" ? null : "cash"; changed = true; }
+      if(inv.orderStatus===undefined){ inv.orderStatus = "delivered"; changed = true; }
+      if(inv.pickupDate===undefined){ inv.pickupDate = inv.date; changed = true; }
+      if(inv.pickupTime===undefined){ inv.pickupTime = ""; changed = true; }
+      if(inv.notes===undefined){ inv.notes = ""; changed = true; }
+    });
+    return changed;
+  }
+
+  function backfillOperationsData(d){
+    let changed=false;
+    if(!Array.isArray(d.rawInventory)){ rawInventory=deepClone(SEED_RAW_INVENTORY).map(x=>({...x,initialized:false})); changed=true; } else rawInventory=d.rawInventory;
+    if(!Array.isArray(d.finishedInventory)){ finishedInventory=deepClone(SEED_FINISHED_INVENTORY).map(x=>({...x,initialized:false})); changed=true; } else finishedInventory=d.finishedInventory;
+    if(!Array.isArray(d.recipes)){ recipes=deepClone(SEED_RECIPES); changed=true; } else recipes=d.recipes;
+    if(!Array.isArray(d.stockMovements)){ stockMovements=[]; changed=true; } else stockMovements=d.stockMovements;
+    appSettings = d.appSettings && typeof d.appSettings==="object" ? {...{autoDeductSales:false,autoDeductProduction:false},...d.appSettings} : {autoDeductSales:false,autoDeductProduction:false};
+    if(!d.appSettings) changed=true;
+    // Link recipe ingredients to raw items and products to finished stock by name when possible.
+    recipes.forEach(r=>{
+      if(!Array.isArray(r.ingredients)) r.ingredients=[];
+      if(!Array.isArray(r.ovenStages)) r.ovenStages=[];
+      r.ingredients.forEach(ing=>{ const raw=findRawByName(ing.rawName||ing.name); if(raw&&!ing.rawId){ing.rawId=raw.id; changed=true;} if(!ing.unit&&raw){ing.unit=raw.unit; changed=true;} });
+      if(!r.finishedStockId){ const f=finishedInventory.find(x=>x.name.trim()===String(r.finishedName||r.name).trim()); if(f){r.finishedStockId=f.id; changed=true;} }
+    });
+    products.forEach(p=>{ if(!p.stockItemId){ const f=finishedInventory.find(x=>x.name.trim()===String(p.name).trim()); if(f){p.stockItemId=f.id; changed=true;} } });
+    invoices.forEach(inv=>{ if(inv.stockDeducted===undefined){inv.stockDeducted=false;changed=true;} if(!Array.isArray(inv.stockEffects)){inv.stockEffects=[];changed=true;} });
+    return changed;
+  }
+
+  async function loadAll(){
+    const {data,error}=await sb.rpc("get_cakeyard_state");
+    if(error) throw error;
+    const d=data||{};
+    stateRevision=Number((d._meta||{}).revision)||0;
+    const initialized=!!((d._meta||{}).initialized);
+    if(!initialized){
+      const legacy=await fetchLegacyGithubData();
+      if(legacy){
+        loadStateIntoMemory(legacy);
+        if(!products.length) products=seedProducts();
+        backfillInvoiceFields();
+        backfillOperationsData(legacy);
+        await persist();
+        localStorage.setItem("cy_supabase_migrated","1");
+      }else{
+        initializeSeeds();
+        await persist();
+      }
+      return;
+    }
+    loadStateIntoMemory(d);
+    const opsChanged=backfillOperationsData(d);
+    if(backfillInvoiceFields() || opsChanged) await persist();
+  }
+
+  // ---------- Tabs ----------
+  function switchTab(tab){
+    currentTab = tab;
+    ["dashboard","invoices","customers","expenses","products","inventory","recipes","more"].forEach(t=> $("#tab-"+t).classList.toggle("hidden", t!==tab));
+    const navTab = ["customers","expenses","products"].includes(tab) ? "more" : tab;
+    $all("nav.bottom-nav button").forEach(b=> b.classList.toggle("active", b.dataset.tab===navTab));
+    render();
+  }
+  function inPeriod(dateStr){
+    const today = todayStr();
+    if(currentPeriod==="today") return dateStr===today;
+    if(currentPeriod==="month") return dateStr.slice(0,7)===currentMonth;
+    return true;
+  }
+  function render(){
+    if(currentTab==="dashboard") renderDashboard();
+    if(currentTab==="invoices") renderInvoices();
+    if(currentTab==="customers") renderCustomers();
+    if(currentTab==="expenses") renderExpenses();
+    if(currentTab==="products") renderProducts();
+    if(currentTab==="inventory") renderInventory();
+    if(currentTab==="recipes") renderRecipes();
+  }
+
+  function computeUncollected(){
+    return invoices.filter(inv=>inv.paymentStatus!=="paid").reduce((a,inv)=> a + (inv.paymentStatus==="partial" ? (inv.total-(inv.amountPaid||0)) : inv.total), 0);
+  }
+
+  function renderDashboard(){
+    const today = todayStr();
+    const todayInvoices = invoices.filter(inv=>inv.date===today);
+    const todayRevenue = todayInvoices.reduce((a,i)=>a+i.total,0);
+    const todayQty = todayInvoices.reduce((a,i)=>a+i.items.reduce((s,it)=>s+it.qty,0),0);
+    const monthPrefix = today.slice(0,7);
+    const monthTotal = invoices.filter(inv=>inv.date.slice(0,7)===monthPrefix).reduce((a,i)=>a+i.total,0);
+
+    $("#statTodaySales").textContent = fmt(todayRevenue);
+    $("#statTodayCount").textContent = todayInvoices.length;
+    $("#statTodayQty").textContent = todayQty;
+    $("#statUncollected").textContent = fmt(computeUncollected());
+    $("#statMonthTotal").textContent = fmt(monthTotal);
+
+    const ordersBox = $("#todayOrders");
+    const todaysPickupOrders = invoices.filter(inv => inv.pickupDate===today || isOverdue(inv))
+      .sort((a,b)=>{
+        const aOver = isOverdue(a), bOver = isOverdue(b);
+        if(aOver && !bOver) return -1;
+        if(!aOver && bOver) return 1;
+        return (a.pickupTime||"99:99").localeCompare(b.pickupTime||"99:99");
+      });
+    if(todaysPickupOrders.length===0){
+      ordersBox.innerHTML = '<div class="empty-state" style="padding:22px 10px;"><span class="emoji">🧾</span><span class="msg">ما فيه طلبات لليوم بعد</span></div>';
+    } else {
+      ordersBox.innerHTML = todaysPickupOrders.map(inv=>{
+        const custName = inv.customerId ? ((customers.find(c=>c.id===inv.customerId)||{}).name||"") : (inv.customerName||"بيع مباشر");
+        const overdue = isOverdue(inv);
+        return `<div class="entry-row" data-open-invoice="${inv.id}" style="cursor:pointer;">
+          <div class="entry-main">
+            <div class="entry-title">${escapeHtml(inv.invoiceNo||"")} · ${escapeHtml(custName)}</div>
+            <div class="entry-sub">${inv.pickupTime?("⏰ "+inv.pickupTime+" · "):""}${inv.items.length} صنف</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+            <div class="entry-amount sale">${fmt(inv.total)}</div>
+            <div style="display:flex;gap:4px;">
+              ${overdue?'<span class="pill overdue">⚠️ متأخر</span>':""}
+              <span class="pill ${inv.orderStatus}" data-status-pill="${inv.id}">${ORDER_STATUS_LABELS[inv.orderStatus]}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+    }
+    renderUpcomingOrders();
+    renderInventoryAlerts();
+
+    const periodInvoices = invoices.filter(inv=>inPeriod(inv.date));
+    const byProduct = {};
+    periodInvoices.forEach(inv=> inv.items.forEach(it=>{ byProduct[it.name] = (byProduct[it.name]||0) + it.qty; }));
+    const top = Object.entries(byProduct).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxQty = top.length ? top[0][1] : 1;
+    const container = $("#topProducts");
+    container.innerHTML = top.length===0
+      ? '<div class="empty-state" style="padding:20px 10px;"><span class="emoji">📊</span><span class="msg">لا توجد مبيعات في هذه الفترة بعد</span></div>'
+      : top.map(([name,q])=>`<div class="top-row"><div class="top-row-head"><span class="name">${escapeHtml(name)}</span><span class="qty">${q} قطعة</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(q/maxQty*100)}%"></div></div></div>`).join("");
+
+    const byCustomer = {};
+    periodInvoices.forEach(inv=>{ if(inv.customerId){ byCustomer[inv.customerId] = (byCustomer[inv.customerId]||0) + inv.total; } });
+    const topCustEntries = Object.entries(byCustomer).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    if(topCustEntries.length===0){ $("#topCustomersBlock").classList.add("hidden"); }
+    else {
+      $("#topCustomersBlock").classList.remove("hidden");
+      const maxAmt = topCustEntries[0][1];
+      $("#topCustomers").innerHTML = topCustEntries.map(([cid,amt])=>{
+        const name = (customers.find(x=>x.id===cid)||{}).name || "—";
+        return `<div class="top-row"><div class="top-row-head"><span class="name">${escapeHtml(name)}</span><span class="qty">${fmt(amt)}</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(amt/maxAmt*100)}%"></div></div></div>`;
+      }).join("");
+    }
+  }
+
+  function groupByDate(list){
+    const map = {};
+    list.forEach(item=>{ (map[item.date] = map[item.date] || []).push(item); });
+    return Object.keys(map).sort((a,b)=>b.localeCompare(a)).map(date=>({date, items:map[date]}));
+  }
+
+  function renderUpcomingOrders(){
+    const today = todayStr();
+    let list = invoices.filter(inv=>inv.pickupDate > today);
+    if(upcomingFilter==="today"){ list = invoices.filter(inv=>inv.pickupDate===today); }
+    else if(upcomingFilter==="tomorrow"){ const t=addDays(today,1); list = invoices.filter(inv=>inv.pickupDate===t); }
+    else if(upcomingFilter==="week"){ const t1=addDays(today,1), t7=addDays(today,7); list = invoices.filter(inv=>inv.pickupDate>=t1 && inv.pickupDate<=t7); }
+    const groups = {};
+    list.forEach(inv=>{ (groups[inv.pickupDate]=groups[inv.pickupDate]||[]).push(inv); });
+    const dates = Object.keys(groups).sort();
+    const box = $("#upcomingOrders");
+    if(!box) return;
+    if(dates.length===0){
+      box.innerHTML = '<div class="empty-state" style="padding:20px 10px;"><span class="emoji">🗓️</span><span class="msg">ما فيه طلبات قادمة بهذا النطاق</span></div>';
+      return;
+    }
+    box.innerHTML = dates.map(d=>{
+      const dayTotal = groups[d].reduce((a,i)=>a+i.total,0);
+      return `<div class="entry-row" data-open-day-orders="${d}" style="cursor:pointer;">
+        <div class="entry-main"><div class="entry-title">${relativeLabel(d)}</div><div class="entry-sub">${groups[d].length} طلب</div></div>
+        <div class="entry-amount sale">${fmt(dayTotal)}</div>
+      </div>`;
+    }).join("");
+  }
+
+  function openDayOrders(dateStr){
+    const dayInvoices = invoices.filter(inv=>inv.pickupDate===dateStr).sort((a,b)=>(a.pickupTime||"99:99").localeCompare(b.pickupTime||"99:99"));
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>طلبات ${relativeLabel(dateStr)}</h3>
+      ${dayInvoices.length===0 ? '<div class="empty-state" style="padding:20px;"><span class="emoji">🗓️</span><span class="msg">ما فيه طلبات</span></div>' : dayInvoices.map(inv=>{
+        const custName = inv.customerId ? ((customers.find(c=>c.id===inv.customerId)||{}).name||"") : (inv.customerName||"بيع مباشر");
+        return `<div class="entry-row" data-open-invoice="${inv.id}" style="cursor:pointer;">
+          <div class="entry-main">
+            <div class="entry-title">${escapeHtml(inv.invoiceNo||"")} · ${escapeHtml(custName)}</div>
+            <div class="entry-sub">${inv.pickupTime?("⏰ "+inv.pickupTime+" · "):""}${inv.items.length} صنف</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+            <div class="entry-amount sale">${fmt(inv.total)}</div>
+            <span class="pill ${inv.orderStatus}" data-status-pill="${inv.id}">${ORDER_STATUS_LABELS[inv.orderStatus]}</span>
+          </div>
+        </div>`;
+      }).join("")}
+    `);
+  }
+
+  function renderInvoices(){
+    const list = $("#invoicesList");
+    const q = ($("#invoiceSearch").value||"").trim().toLowerCase();
+    let filtered = invoices;
+    if(q){
+      filtered = invoices.filter(inv=>{
+        const custName = inv.customerId ? ((customers.find(c=>c.id===inv.customerId)||{}).name||"") : (inv.customerName||"");
+        const itemNames = inv.items.map(it=>it.name).join(" ");
+        return ((inv.invoiceNo||"")+" "+custName+" "+itemNames+" "+inv.date).toLowerCase().includes(q);
+      });
+    }
+    if(filtered.length===0){
+      list.innerHTML = `<div class="empty-state"><span class="emoji">🧁</span><span class="msg">${q?"ما فيه نتائج مطابقة":'ما فيه فواتير مسجّلة بعد<br>اضغط "＋ فاتورة جديدة" للبدء'}</span></div>`;
+      return;
+    }
+    const groups = groupByDate(filtered);
+    list.innerHTML = groups.map(g=>{
+      const dayTotal = g.items.reduce((a,inv)=>a+inv.total,0);
+      const rows = g.items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(inv=>{
+        const custName = inv.customerId ? ((customers.find(c=>c.id===inv.customerId)||{}).name||"") : (inv.customerName||"");
+        const summary = escapeHtml(inv.items.map(it=>it.name+" ×"+it.qty).join("، "));
+        const overdue = isOverdue(inv);
+        const pickupLine = inv.pickupDate && inv.pickupDate!==inv.date
+          ? `<div class="entry-sub" style="color:var(--purple);">📅 استلام: ${relativeLabel(inv.pickupDate)}${inv.pickupTime?" ⏰"+inv.pickupTime:""}</div>` : "";
+        return `<div class="entry-row">
+          <div class="entry-main" data-open-invoice="${inv.id}" style="cursor:pointer;">
+            <div class="entry-title">${escapeHtml(inv.invoiceNo||"")}${custName?" · "+escapeHtml(custName):""}</div>
+            <div class="entry-sub">${summary}</div>
+            ${pickupLine}
+            <div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap;">
+              ${overdue?'<span class="pill overdue">⚠️ متأخر</span>':""}
+              <span class="pill ${inv.orderStatus}" data-status-pill="${inv.id}">${ORDER_STATUS_LABELS[inv.orderStatus]}</span>
+              <span class="pill ${inv.paymentStatus}">${PAYMENT_STATUS_LABELS[inv.paymentStatus]}</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+            <div class="entry-amount sale">${fmt(inv.total)}</div>
+            <div class="entry-actions">
+              <button class="icon-btn" data-repeat-invoice="${inv.id}" title="تكرار">🔁</button>
+              <button class="icon-btn" data-print-invoice="${inv.id}" title="طباعة">🖨️</button>
+              <button class="icon-btn" data-del-invoice="${inv.id}" title="حذف">🗑️</button>
+            </div>
+          </div>
+        </div>`;
+      }).join("");
+      return `<div class="day-group"><div class="day-header"><span>${fmtDateHeading(g.date)}</span><span class="total">${fmt(dayTotal)}</span></div>${rows}</div>`;
+    }).join("");
+  }
+
+  function renderExpenses(){
+    const list = $("#expensesList");
+    if(expenses.length===0){
+      list.innerHTML = '<div class="empty-state"><span class="emoji">🧾</span><span class="msg">ما فيه مصروفات مسجّلة بعد<br>اضغط "＋ تسجيل مصروف" للبدء</span></div>';
+      return;
+    }
+    const groups = groupByDate(expenses);
+    list.innerHTML = groups.map(g=>{
+      const dayTotal = g.items.reduce((a,e)=>a+e.value,0);
+      const rows = g.items.slice().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(e=>`
+        <div class="entry-row">
+          <div class="entry-main"><div class="entry-title">${escapeHtml(e.type)}</div><div class="entry-sub">${escapeHtml(e.desc||"—")}</div></div>
+          <div class="entry-amount expense">${fmt(e.value)}</div>
+          <div class="entry-actions"><button class="icon-btn" data-edit-expense="${e.id}">✏️</button><button class="icon-btn" data-del-expense="${e.id}">🗑️</button></div>
+        </div>`).join("");
+      return `<div class="day-group"><div class="day-header"><span>${fmtDateHeading(g.date)}</span><span class="total">${fmt(dayTotal)}</span></div>${rows}</div>`;
+    }).join("");
+  }
+
+  function renderProducts(){
+    const list = $("#productsList");
+    const q = ($("#productSearch").value||"").trim().toLowerCase();
+    const filtered = q ? products.filter(p=>p.name.toLowerCase().includes(q)) : products;
+    if(filtered.length===0){
+      list.innerHTML = `<div class="empty-state"><span class="emoji">🧁</span><span class="msg">${q?"ما فيه نتائج مطابقة":"ما فيه أصناف مضافة بعد"}</span></div>`;
+      return;
+    }
+    const cats = {};
+    filtered.forEach(p=>{ (cats[p.category||"أخرى"] = cats[p.category||"أخرى"] || []).push(p); });
+    list.innerHTML = Object.keys(cats).map(cat=>{
+      const rows = cats[cat].map(p=>`
+        <div class="product-row">
+          <div class="entry-main"><div class="product-name">${escapeHtml(p.name)}</div><div class="product-meta">تكلفة القطعة ${fmt(p.cost)} · هامش ${fmt(p.price-p.cost)}</div></div>
+          <div class="product-price">${fmt(p.price)}</div>
+          <div class="entry-actions"><button class="icon-btn" data-edit-product="${p.id}">✏️</button><button class="icon-btn" data-del-product="${p.id}">🗑️</button></div>
+        </div>`).join("");
+      return `<div class="category-group"><div class="category-title">${escapeHtml(cat)}</div>${rows}</div>`;
+    }).join("");
+  }
+
+  function renderCustomers(){
+    const list = $("#customersList");
+    if(customers.length===0){
+      list.innerHTML = '<div class="empty-state"><span class="emoji">👥</span><span class="msg">ما فيه عملاء مضافين بعد<br>اضغط "＋ عميل جديد" للبدء</span></div>';
+      return;
+    }
+    const groups = {cafe:[], individual:[]};
+    customers.forEach(c=> groups[c.type==="cafe"?"cafe":"individual"].push(c));
+    const section = (title, arr) => arr.length===0 ? "" : `<div class="category-group"><div class="category-title">${title}</div>${arr.map(c=>{
+      const custInvoices = invoices.filter(inv=>inv.customerId===c.id);
+      const total = custInvoices.reduce((a,i)=>a+i.total,0);
+      return `<div class="product-row" data-open-customer="${c.id}" style="cursor:pointer;">
+        <div class="entry-main"><div class="product-name">${escapeHtml(c.name)}</div><div class="product-meta">${custInvoices.length} فاتورة${c.phone?" · "+escapeHtml(c.phone):""}</div></div>
+        <div class="product-price">${fmt(total)}</div>
+      </div>`;
+    }).join("")}</div>`;
+    list.innerHTML = section("☕ كافيهات", groups.cafe) + section("🧍 أفراد", groups.individual);
+  }
+
+
+  // ---------- Inventory ----------
+  function renderInventoryAlerts(){
+    const f=lowFinished(), r=lowRaw(), block=$("#inventoryAlertsBlock"), box=$("#inventoryAlerts");
+    if(!block||!box) return;
+    const all=[...f.map(x=>({type:"finished",x})),...r.map(x=>({type:"raw",x}))];
+    if(all.length===0){ block.classList.add("hidden"); box.innerHTML=""; return; }
+    block.classList.remove("hidden");
+    box.innerHTML=all.slice(0,5).map(o=>`<div class="stock-alert ${Number(o.x.qty)<=0?'danger':'warn'}" data-go-stock="${o.type}"><div><b>${escapeHtml(o.x.name)}</b><div style="font-size:11px;color:var(--muted);margin-top:2px;">المتوفر ${Number(o.x.qty)||0} ${stockLabelUnit(o.x.unit)} · الحد ${Number(o.x.minQty)||0}</div></div><span>${Number(o.x.qty)<=0?'⛔':'⚠️'}</span></div>`).join("") + (all.length>5?`<div style="font-size:11.5px;color:var(--muted);text-align:center;">+ ${all.length-5} تنبيهات أخرى</div>`:"");
+  }
+
+  function renderInventory(){
+    $("#autoDeductSalesToggle").checked=!!appSettings.autoDeductSales;
+    $("#autoDeductProductionToggle").checked=!!appSettings.autoDeductProduction;
+    const list=$("#inventoryList"), q=($("#inventorySearch").value||"").trim().toLowerCase();
+    $("#addStockBtn").style.display=inventoryMode==="moves"?"none":"flex";
+    if(inventoryMode==="moves"){
+      $("#inventorySearch").placeholder="🔍 ابحث في الحركات";
+      const rows=stockMovements.filter(m=>!q || ((m.itemName||"")+" "+(m.reason||"")).toLowerCase().includes(q)).slice(0,120);
+      list.innerHTML=rows.length?`<div class="top-products">${rows.map(m=>`<div class="movement-row"><div><div class="mv-title">${escapeHtml(m.itemName||"—")}</div><div class="mv-sub">${escapeHtml(m.reason||"")} · ${movementDateLabel(m.createdAt)}</div></div><div class="mv-qty ${Number(m.delta)>=0?'pos':'neg'}">${Number(m.delta)>=0?'+':''}${Number(m.delta)} ${stockLabelUnit(m.unit)}</div></div>`).join("")}</div>`:'<div class="empty-state"><span class="emoji">📋</span><span class="msg">ما فيه حركات مخزون بعد</span></div>';
+      return;
+    }
+    $("#inventorySearch").placeholder=inventoryMode==="finished"?"🔍 ابحث في المنتجات الجاهزة":"🔍 ابحث في المواد الخام";
+    const arr=(inventoryMode==="finished"?finishedInventory:rawInventory).filter(x=>!q || (x.name+" "+(x.category||"")+" "+(x.location||"")).toLowerCase().includes(q));
+    if(arr.length===0){ list.innerHTML='<div class="empty-state"><span class="emoji">📦</span><span class="msg">ما فيه عناصر مطابقة</span></div>'; return; }
+    const groups={}; arr.forEach(x=>{ const k=inventoryMode==="raw"?(x.category||"أخرى"):(x.location||"غير محدد"); (groups[k]=groups[k]||[]).push(x); });
+    list.innerHTML=Object.keys(groups).map(g=>`<div class="category-group"><div class="category-title">${inventoryMode==="raw"?"📦 ":"🧊 "}${escapeHtml(g)}</div>${groups[g].map(x=>{
+      const low=x.initialized!==false && Number(x.minQty)>0 && Number(x.qty)<=Number(x.minQty);
+      return `<div class="stock-row ${low?'low':''}"><div class="stock-main" data-edit-stock="${inventoryMode}:${x.id}" style="cursor:pointer;"><div class="stock-name">${escapeHtml(x.name)} ${low?'⚠️':''}</div><div class="stock-sub">${x.location?escapeHtml(x.location)+' · ':''}الحد ${Number(x.minQty)||0} ${stockLabelUnit(x.unit)}${inventoryMode==='raw'&&Number(x.unitCost)?' · تكلفة '+Number(x.unitCost).toFixed(4)+' ر.ع':''}</div></div><button class="stock-mini-btn minus" data-stock-adjust="${inventoryMode}:${x.id}:-1">−</button><div class="stock-qty">${x.initialized===false?"—":(Number(x.qty)||0)} ${stockLabelUnit(x.unit)}</div><button class="stock-mini-btn" data-stock-adjust="${inventoryMode}:${x.id}:1">+</button></div>`;
+    }).join("")}</div>`).join("");
+  }
+
+  function openStockForm(type,id){
+    const arr=type==="raw"?rawInventory:finishedInventory, existing=id?arr.find(x=>x.id===id):null;
+    openSheet(`<div class="sheet-handle"></div><h3>${existing?'تعديل':'إضافة'} ${type==='raw'?'مادة خام':'منتج جاهز'}</h3>
+      <div class="field"><label>الاسم</label><input id="sf-name" value="${existing?escapeHtml(existing.name):''}"></div>
+      <div class="field"><label>${type==='raw'?'التصنيف':'الفئة'}</label><input id="sf-cat" value="${existing?escapeHtml(existing.category||''):''}"></div>
+      <div class="form-grid-2"><div class="field"><label>الوحدة</label><select id="sf-unit">${['gram','piece','kg','ml','وحدة','كيك','صينية','بوكس'].map(u=>`<option value="${u}" ${existing&&existing.unit===u?'selected':''}>${stockLabelUnit(u)}</option>`).join('')}</select></div><div class="field"><label>الكمية الحالية</label><input type="number" step="0.001" id="sf-qty" value="${existing?Number(existing.qty)||0:0}"></div></div>
+      <div class="form-grid-2"><div class="field"><label>الحد الأدنى</label><input type="number" step="0.001" id="sf-min" value="${existing?Number(existing.minQty)||0:0}"></div><div class="field"><label>المكان</label><input id="sf-loc" placeholder="ثلاجة 1 / فريزر / رف" value="${existing?escapeHtml(existing.location||''):''}"></div></div>
+      ${type==='raw'?`<div class="field"><label>تكلفة الوحدة (ر.ع)</label><input type="number" step="0.0001" id="sf-cost" value="${existing?Number(existing.unitCost)||0:0}"></div>`:''}
+      <div class="field"><label>ملاحظات</label><input id="sf-notes" value="${existing?escapeHtml(existing.notes||''):''}"></div>
+      <div class="sheet-actions"><button class="btn btn-secondary" id="sf-cancel">إلغاء</button><button class="btn btn-primary" id="sf-save">حفظ</button></div>
+      ${existing?'<button class="btn btn-danger" id="sf-delete" style="width:100%;margin-top:10px;">حذف</button>':''}`);
+    $("#sf-cancel").onclick=closeSheet;
+    $("#sf-save").onclick=async()=>{
+      const name=$("#sf-name").value.trim(); if(!name){$("#sf-name").focus();return;}
+      const oldQty=existing?Number(existing.qty)||0:0;
+      const rec={id:existing?existing.id:uid(),initialized:true,name,category:$("#sf-cat").value.trim()||"أخرى",unit:$("#sf-unit").value,qty:+(Number($("#sf-qty").value)||0).toFixed(3),minQty:+(Number($("#sf-min").value)||0).toFixed(3),location:$("#sf-loc").value.trim(),notes:$("#sf-notes").value.trim()};
+      if(type==='raw') rec.unitCost=+(Number($("#sf-cost").value)||0).toFixed(6);
+      if(existing){ const ix=arr.findIndex(x=>x.id===existing.id); arr[ix]=rec; const diff=rec.qty-oldQty; if(diff) addMovement(type,rec,diff,"تعديل الكمية من بطاقة المخزون"); }
+      else { arr.push(rec); if(rec.qty) addMovement(type,rec,rec.qty,"رصيد افتتاحي"); }
+      await persist(); closeSheet(); renderInventory(); renderInventoryAlerts();
+    };
+    if(existing) $("#sf-delete").onclick=async()=>{ if(!confirm("حذف هذا العنصر من المخزون؟"))return; if(type==='raw') rawInventory=rawInventory.filter(x=>x.id!==existing.id); else finishedInventory=finishedInventory.filter(x=>x.id!==existing.id); await persist(); closeSheet(); renderInventory(); };
+  }
+
+  function openStockAdjust(type,id,sign){
+    const arr=type==="raw"?rawInventory:finishedInventory, item=arr.find(x=>x.id===id); if(!item)return;
+    openSheet(`<div class="sheet-handle"></div><h3>${sign>0?'إضافة':'خصم'} مخزون</h3><div class="muted-box"><b>${escapeHtml(item.name)}</b><br>الحالي: ${Number(item.qty)||0} ${stockLabelUnit(item.unit)}</div><div class="field"><label>الكمية</label><input type="number" min="0" step="0.001" id="sa-qty" value="1"></div><div class="field"><label>السبب</label><input id="sa-reason" placeholder="إنتاج / استخدام / جرد / تلف"></div><div class="sheet-actions"><button class="btn btn-secondary" id="sa-cancel">إلغاء</button><button class="btn btn-primary" id="sa-save">حفظ</button></div>`);
+    $("#sa-cancel").onclick=closeSheet; $("#sa-save").onclick=async()=>{ const q=Math.abs(Number($("#sa-qty").value)||0); if(!q)return; const delta=sign*q; item.qty=+(Number(item.qty)+delta).toFixed(3); item.initialized=true; addMovement(type,item,delta,$("#sa-reason").value.trim()||"تعديل يدوي"); await persist(); closeSheet(); renderInventory(); renderInventoryAlerts(); };
+  }
+
+  // ---------- Recipes / Production ----------
+  function renderRecipes(){
+    const list=$("#recipesList"), q=($("#recipeSearch").value||"").trim().toLowerCase();
+    const arr=recipes.filter(r=>!q || (r.name+" "+(r.category||"")+" "+(r.moldSize||"")).toLowerCase().includes(q));
+    if(!arr.length){list.innerHTML='<div class="empty-state"><span class="emoji">📖</span><span class="msg">ما فيه وصفات مطابقة</span></div>';return;}
+    const groups={}; arr.forEach(r=>(groups[r.category||"أخرى"]=groups[r.category||"أخرى"]||[]).push(r));
+    list.innerHTML=Object.keys(groups).map(g=>`<div class="category-group"><div class="category-title">${escapeHtml(g)}</div>${groups[g].map(r=>`<div class="recipe-card" data-open-recipe="${r.id}"><div class="recipe-name">${escapeHtml(r.name)}</div><div class="recipe-meta"><span class="recipe-chip">${(r.ingredients||[]).length} مكوّن</span><span class="recipe-chip gold">الناتج ${Number(r.yieldQty)||1} ${escapeHtml(r.yieldUnit||'وحدة')}</span>${r.moldSize?`<span class="recipe-chip">${escapeHtml(r.moldSize)}</span>`:''}${(r.ovenStages||[]).length?`<span class="recipe-chip">🔥 ${(r.ovenStages||[]).length} مرحلة</span>`:''}</div></div>`).join('')}</div>`).join('');
+  }
+
+  function ingredientRowsHtml(arr){ return arr.map((ing,idx)=>`<div class="inline-row"><select data-rf-ing-name="${idx}" style="flex:2;">${rawInventory.map(x=>`<option value="${x.id}" ${ing.rawId===x.id||(!ing.rawId&&String(ing.rawName||'').trim()===x.name.trim())?'selected':''}>${escapeHtml(x.name)}</option>`).join('')}</select><input data-rf-ing-qty="${idx}" type="number" step="0.001" value="${Number(ing.qty)||0}" style="width:85px;"><button class="icon-btn" type="button" data-rf-ing-del="${idx}">✕</button></div>`).join(''); }
+  function stageRowsHtml(arr){ return arr.map((s,idx)=>`<div class="inline-row"><input data-rf-temp="${idx}" type="number" placeholder="°C" value="${s.tempC??''}" style="width:68px;"><input data-rf-min="${idx}" type="number" placeholder="د" value="${s.minutes??''}" style="width:58px;"><select data-rf-fan="${idx}" style="width:72px;"><option value="0" ${String(s.fan)==='0'?'selected':''}>مروحة 0</option><option value="1" ${String(s.fan)==='1'?'selected':''}>مروحة 1</option><option value="2" ${String(s.fan)==='2'?'selected':''}>مروحة 2</option></select><input data-rf-steam="${idx}" type="number" min="0" max="100" placeholder="بخار%" value="${s.steamPct??0}" style="width:68px;"><button class="icon-btn" type="button" data-rf-stage-del="${idx}">✕</button></div>`).join(''); }
+
+  function openRecipeForm(id){
+    const existing=id?recipes.find(r=>r.id===id):null;
+    let draftIngredients=deepClone(existing?.ingredients||[]); if(!draftIngredients.length&&rawInventory.length) draftIngredients=[{rawId:rawInventory[0].id,rawName:rawInventory[0].name,qty:0,unit:rawInventory[0].unit}];
+    let draftStages=deepClone(existing?.ovenStages||[]);
+    openSheet(`<div class="sheet-handle"></div><h3>${existing?'تعديل وصفة':'وصفة جديدة'}</h3><div class="field"><label>اسم الوصفة</label><input id="rf-name" value="${existing?escapeHtml(existing.name):''}"></div><div class="form-grid-2"><div class="field"><label>الفئة</label><input id="rf-cat" value="${existing?escapeHtml(existing.category||''):''}"></div><div class="field"><label>الحجم / القالب</label><input id="rf-size" placeholder="مثال 27 cm" value="${existing?escapeHtml(existing.moldSize||''):''}"></div></div><div class="form-grid-2"><div class="field"><label>الناتج</label><input type="number" min="0" step="0.1" id="rf-yield" value="${existing?Number(existing.yieldQty)||1:1}"></div><div class="field"><label>وحدة الناتج</label><input id="rf-yunit" value="${existing?escapeHtml(existing.yieldUnit||'وحدة'):'وحدة'}"></div></div><div class="field"><label>يرتبط بمخزون جاهز</label><select id="rf-finished"><option value="">بدون ربط</option>${finishedInventory.map(x=>`<option value="${x.id}" ${existing&&existing.finishedStockId===x.id?'selected':''}>${escapeHtml(x.name)}</option>`).join('')}</select></div><div class="section-title">المكونات</div><div id="rf-ings"></div><button type="button" class="btn btn-secondary" id="rf-add-ing" style="width:100%;margin-bottom:14px;">＋ مكوّن</button><div class="section-title">إعدادات فرن UNOX</div><div id="rf-stages"></div><button type="button" class="btn btn-secondary" id="rf-add-stage" style="width:100%;margin-bottom:14px;">＋ مرحلة فرن</button><div class="field"><label>طريقة التحضير</label><textarea class="cy-textarea" id="rf-method">${existing?escapeHtml(existing.method||''):''}</textarea></div><div class="field"><label>ملاحظات</label><textarea class="cy-textarea" id="rf-notes" style="min-height:70px;">${existing?escapeHtml(existing.notes||''):''}</textarea></div><div class="sheet-actions"><button class="btn btn-secondary" id="rf-cancel">إلغاء</button><button class="btn btn-primary" id="rf-save">حفظ</button></div>${existing?'<button class="btn btn-danger" id="rf-delete" style="width:100%;margin-top:10px;">حذف الوصفة</button>':''}`);
+    const rerender=()=>{$("#rf-ings").innerHTML=ingredientRowsHtml(draftIngredients);$("#rf-stages").innerHTML=stageRowsHtml(draftStages);}; rerender();
+    $("#rf-ings").onclick=e=>{const b=e.target.closest('[data-rf-ing-del]');if(b){draftIngredients.splice(Number(b.dataset.rfIngDel),1);rerender();}};
+    $("#rf-stages").onclick=e=>{const b=e.target.closest('[data-rf-stage-del]');if(b){draftStages.splice(Number(b.dataset.rfStageDel),1);rerender();}};
+    $("#rf-add-ing").onclick=()=>{if(rawInventory.length)draftIngredients.push({rawId:rawInventory[0].id,rawName:rawInventory[0].name,qty:0,unit:rawInventory[0].unit});rerender();};
+    $("#rf-add-stage").onclick=()=>{draftStages.push({tempC:180,minutes:10,fan:0,steamPct:0});rerender();};
+    $("#rf-cancel").onclick=closeSheet;
+    $("#rf-save").onclick=async()=>{
+      const name=$("#rf-name").value.trim();if(!name)return;
+      draftIngredients=draftIngredients.map((ing,idx)=>{const sel=$(`[data-rf-ing-name="${idx}"]`),raw=rawInventory.find(x=>x.id===sel.value);return{rawId:raw?.id||null,rawName:raw?.name||"",qty:+(Number($(`[data-rf-ing-qty="${idx}"]`).value)||0).toFixed(3),unit:raw?.unit||"gram"};}).filter(x=>x.rawName);
+      draftStages=draftStages.map((s,idx)=>({tempC:Number($(`[data-rf-temp="${idx}"]`).value)||0,minutes:Number($(`[data-rf-min="${idx}"]`).value)||0,fan:Number($(`[data-rf-fan="${idx}"]`).value)||0,steamPct:Number($(`[data-rf-steam="${idx}"]`).value)||0}));
+      const rec={id:existing?existing.id:uid(),initialized:true,name,category:$("#rf-cat").value.trim()||"أخرى",moldSize:$("#rf-size").value.trim(),yieldQty:+(Number($("#rf-yield").value)||1).toFixed(3),yieldUnit:$("#rf-yunit").value.trim()||"وحدة",ingredients:draftIngredients,ovenStages:draftStages,method:$("#rf-method").value.trim(),notes:$("#rf-notes").value.trim(),finishedStockId:$("#rf-finished").value||null,finishedName:""};
+      const fs=rec.finishedStockId?finishedInventory.find(x=>x.id===rec.finishedStockId):null;rec.finishedName=fs?fs.name:name;
+      if(existing){recipes[recipes.findIndex(r=>r.id===existing.id)]=rec;}else recipes.push(rec);
+      await persist();closeSheet();renderRecipes();
+    };
+    if(existing)$("#rf-delete").onclick=async()=>{if(!confirm("حذف هذه الوصفة؟"))return;recipes=recipes.filter(r=>r.id!==existing.id);await persist();closeSheet();renderRecipes();};
+  }
+
+  function openRecipeDetail(id){
+    const r=recipes.find(x=>x.id===id);if(!r)return;let factor=1;
+    openSheet(`<div class="sheet-handle"></div><h3>${escapeHtml(r.name)}</h3><div class="recipe-meta" style="justify-content:center;margin-bottom:14px;"><span class="recipe-chip gold">الناتج ${Number(r.yieldQty)||1} ${escapeHtml(r.yieldUnit||'وحدة')}</span>${r.moldSize?`<span class="recipe-chip">${escapeHtml(r.moldSize)}</span>`:''}</div><div class="section-title">تغيير الكمية</div><div class="scale-row"><button class="scale-btn" data-scale="0.5">½×</button><button class="scale-btn active" data-scale="1">1×</button><button class="scale-btn" data-scale="2">2×</button><button class="scale-btn" data-scale="3">3×</button><input id="customScale" type="number" min="0.1" step="0.1" value="1" style="width:74px;border:1.5px solid var(--border);border-radius:999px;padding:7px 10px;font-family:inherit;"></div><div class="section-title">المكونات</div><div id="recipeScaled"></div><div class="section-title">UNOX / الفرن</div>${(r.ovenStages||[]).length?`<div id="recipeStages"></div>`:'<div class="muted-box">ما تم تسجيل إعدادات الفرن لهذه الوصفة بعد.</div>'}${r.method?`<div class="section-title">الطريقة</div><div class="muted-box" style="white-space:pre-wrap;color:var(--ink);">${escapeHtml(r.method)}</div>`:''}${r.notes?`<div class="section-title">ملاحظات</div><div class="muted-box" style="white-space:pre-wrap;">${escapeHtml(r.notes)}</div>`:''}<div class="sheet-actions"><button class="btn btn-secondary" id="recipeEditBtn">✏️ تعديل</button><button class="btn btn-primary" id="recipeProduceBtn">👨‍🍳 إنتاج</button></div>`);
+    const update=()=>{const rows=(r.ingredients||[]).map(i=>`<tr><td>${escapeHtml(i.rawName||'')}</td><td><b>${+(Number(i.qty)*factor).toFixed(3)}</b></td><td>${stockLabelUnit(i.unit)}</td></tr>`).join('');$("#recipeScaled").innerHTML=`<table class="recipe-table"><thead><tr><th>المكوّن</th><th>الكمية</th><th>الوحدة</th></tr></thead><tbody>${rows}</tbody></table><div class="live-total"><span>الناتج المتوقع</span><span>${+(Number(r.yieldQty||1)*factor).toFixed(2)} ${escapeHtml(r.yieldUnit||'وحدة')}</span></div>`;};update();
+    if($("#recipeStages"))$("#recipeStages").innerHTML=(r.ovenStages||[]).map((s,idx)=>`<div class="stage-card"><div class="stage-title">المرحلة ${idx+1}</div><div class="stage-meta">🔥 ${s.tempC||0}°C · ⏱ ${s.minutes||0} دقيقة · مروحة ${s.fan??0} · بخار ${s.steamPct||0}%</div></div>`).join('');
+    $all('[data-scale]').forEach(b=>b.onclick=()=>{factor=Number(b.dataset.scale);$("#customScale").value=factor;$all('[data-scale]').forEach(x=>x.classList.toggle('active',x===b));update();});
+    $("#customScale").oninput=e=>{factor=Math.max(.1,Number(e.target.value)||1);$all('[data-scale]').forEach(x=>x.classList.remove('active'));update();};
+    $("#recipeEditBtn").onclick=()=>{closeSheet();setTimeout(()=>openRecipeForm(id),220);}; $("#recipeProduceBtn").onclick=()=>{closeSheet();setTimeout(()=>openProductionForm(id,factor),220);};
+  }
+
+  function openProductionForm(recipeId,initialFactor){
+    const r=recipes.find(x=>x.id===recipeId);if(!r)return;let factor=initialFactor||1;
+    openSheet(`<div class="sheet-handle"></div><h3>إنتاج · ${escapeHtml(r.name)}</h3><div class="setting-row"><div><div class="st">خصم المواد الخام</div><div class="ss">${appSettings.autoDeductProduction?'مفعل — سيتم الخصم تلقائيًا':'متوقف — لن تتغير المواد الخام'}</div></div><span class="pill ${appSettings.autoDeductProduction?'paid':'credit'}">${appSettings.autoDeductProduction?'مفعل':'متوقف'}</span></div><div class="field"><label>عدد الوصفات / الدفعات</label><input type="number" min="0.1" step="0.1" id="prod-factor" value="${factor}"></div><div class="live-total"><span>سيضاف للمخزون الجاهز</span><span id="prod-output"></span></div><div class="muted-box">عند التنفيذ يضاف الناتج إلى المنتج الجاهز المرتبط بالوصفة. إذا كان الخصم التلقائي للمواد الخام مفعّلًا، تُخصم المكونات حسب عدد الدفعات.</div><div class="sheet-actions"><button class="btn btn-secondary" id="prod-cancel">إلغاء</button><button class="btn btn-primary" id="prod-run">تنفيذ الإنتاج</button></div>`);
+    const upd=()=>{$("#prod-output").textContent=`${+(Number(r.yieldQty||1)*(Number($("#prod-factor").value)||1)).toFixed(2)} ${r.yieldUnit||'وحدة'}`;};upd();$("#prod-factor").oninput=upd;$("#prod-cancel").onclick=closeSheet;
+    $("#prod-run").onclick=async()=>{factor=Math.max(.1,Number($("#prod-factor").value)||1);const shortages=[];if(appSettings.autoDeductProduction){(r.ingredients||[]).forEach(ing=>{const raw=ing.rawId?rawInventory.find(x=>x.id===ing.rawId):findRawByName(ing.rawName);const need=Number(ing.qty||0)*factor;if(!raw||Number(raw.qty)<need)shortages.push(`${ing.rawName}: يحتاج ${+need.toFixed(3)} ${stockLabelUnit(ing.unit)}${raw?' والمتوفر '+Number(raw.qty):' (غير موجود بالمخزون)'}`);});if(shortages.length){alert("لا يمكن تنفيذ الخصم التلقائي لأن المخزون غير كاف:\n\n"+shortages.join("\n"));return;}}
+      if(appSettings.autoDeductProduction){(r.ingredients||[]).forEach(ing=>{const raw=ing.rawId?rawInventory.find(x=>x.id===ing.rawId):findRawByName(ing.rawName);const need=Number(ing.qty||0)*factor;if(raw&&need){raw.qty=+(Number(raw.qty)-need).toFixed(3);addMovement('raw',raw,-need,`إنتاج ${r.name}`,'recipe',r.id);}});}
+      let fin=r.finishedStockId?finishedInventory.find(x=>x.id===r.finishedStockId):finishedInventory.find(x=>x.name.trim()===r.name.trim());if(!fin){fin={id:uid(),name:r.name,category:r.category||'أخرى',unit:r.yieldUnit||'وحدة',qty:0,minQty:0,location:'',notes:''};finishedInventory.push(fin);r.finishedStockId=fin.id;r.finishedName=fin.name;}
+      const out=Number(r.yieldQty||1)*factor;fin.qty=+(Number(fin.qty)+out).toFixed(3);fin.initialized=true;addMovement('finished',fin,out,`إنتاج ${r.name}`,'recipe',r.id);await persist();closeSheet();render();alert("تم تسجيل الإنتاج وتحديث المخزون ✅"); };
+  }
+
+  function restoreInvoiceStock(inv,reason){
+    if(!inv||!inv.stockDeducted||!Array.isArray(inv.stockEffects))return;
+    inv.stockEffects.forEach(e=>{const item=finishedInventory.find(x=>x.id===e.itemId);if(item){item.qty=+(Number(item.qty)+Number(e.qty)).toFixed(3);item.initialized=true;addMovement('finished',item,Number(e.qty),reason||`استرجاع ${inv.invoiceNo||'فاتورة'}`,'invoice',inv.id);}});inv.stockDeducted=false;inv.stockEffects=[];
+  }
+  function deductInvoiceStock(inv,forceMode){
+    const should=forceMode!==undefined?forceMode:!!appSettings.autoDeductSales;if(!should){inv.stockDeducted=false;inv.stockEffects=[];return true;}
+    const effects=[];const shortages=[];
+    inv.items.forEach(it=>{if(!it.productId)return;const item=findFinishedForProduct(it.productId,it.name);if(!item)return;const q=Number(it.qty)||0;if(Number(item.qty)<q)shortages.push(`${item.name}: المطلوب ${q} والمتوفر ${Number(item.qty)||0}`);effects.push({itemId:item.id,qty:q});});
+    if(shortages.length&&!confirm("تنبيه: بعض المنتجات الجاهزة أقل من كمية البيع:\n\n"+shortages.join("\n")+"\n\nهل تحفظ الفاتورة وتسمح للمخزون أن يصبح سالبًا؟"))return false;
+    effects.forEach(e=>{const item=finishedInventory.find(x=>x.id===e.itemId);if(item){item.qty=+(Number(item.qty)-e.qty).toFixed(3);item.initialized=true;addMovement('finished',item,-e.qty,`بيع ${inv.invoiceNo||''}`,'invoice',inv.id);}});inv.stockDeducted=effects.length>0;inv.stockEffects=effects;return true;
+  }
+
+  // ---------- Sheets ----------
+  const overlay = $("#overlay");
+  const sheet = $("#sheet");
+  function closeSheet(){ overlay.classList.remove("show"); sheet.classList.remove("show"); setTimeout(()=>{ sheet.innerHTML=""; }, 200); }
+  overlay.addEventListener("click", closeSheet);
+  function openSheet(html){ sheet.innerHTML = html; overlay.classList.add("show"); requestAnimationFrame(()=> sheet.classList.add("show")); }
+  function customerOptionsHtml(selectedId){
+    return customers.map(c=>`<option value="${c.id}" ${c.id===selectedId?"selected":""}>${c.type==="cafe"?"☕ ":"🧍 "}${escapeHtml(c.name)}</option>`).join("");
+  }
+
+  function openStatusPicker(invoiceId){
+    const inv = invoices.find(i=>i.id===invoiceId);
+    if(!inv) return;
+    openSheet(`
+      <div class="sheet-handle"></div>
+      <h3>حالة الطلب</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${Object.keys(ORDER_STATUS_LABELS).map(k=>`<button type="button" class="btn ${inv.orderStatus===k?'btn-primary':'btn-secondary'}" data-set-status="${k}">${ORDER_STATUS_LABELS[k]}</button>`).join("")}
+      </div>`);
+    $all("[data-set-status]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{ inv.orderStatus = btn.dataset.setStatus; await persist(); closeSheet(); render(); });
+    });
+  }
+
+  // ---------- Order screen (cart-based POS flow) ----------
+  function closeOrderScreen(){ $("#orderScreen").classList.add("hidden"); }
+
+  function openOrderScreen(existing, duplicateFrom){
+    const source = existing || duplicateFrom;
+    let cartLines = source ? source.items.map(it=>({productId:it.productId, name:it.name, qty:it.qty, price:it.price, cost:it.cost})) : [];
+    let customerMode = "direct", selectedCustomerId = null, temporaryName = "";
+    if(source){
+      if(source.customerId){ customerMode="registered"; selectedCustomerId=source.customerId; }
+      else if(source.customerName){ customerMode="temporary"; temporaryName=source.customerName; }
+    }
+    let paymentStatus = existing ? existing.paymentStatus : "paid";
+    let paymentMethod = existing ? (existing.paymentMethod||"cash") : "cash";
+    const pickupDateVal = existing ? (existing.pickupDate||existing.date||todayStr()) : todayStr();
+    const pickupTimeVal = existing ? (existing.pickupTime||"") : "";
+    const notesVal = existing ? (existing.notes||"") : "";
+    // الاستخدام اليومي يكون استلام اليوم مباشرة. الجدولة تظهر فقط عند الحاجة.
+    let orderTiming = existing && ((existing.pickupDate||existing.date)!==(existing.date||todayStr()) || !!existing.pickupTime) ? "scheduled" : "today";
+
+    $("#orderScreenTitle").textContent = existing ? ("تعديل "+(existing.invoiceNo||"")) : (duplicateFrom ? "تكرار طلب" : "طلب جديد");
+    $("#orderScreen").classList.remove("hidden");
+
+    function favoriteProducts(){
+      const tally = {};
+      invoices.forEach(inv=>inv.items.forEach(it=>{ if(it.productId) tally[it.productId]=(tally[it.productId]||0)+it.qty; }));
+      return Object.entries(tally).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([pid])=>products.find(p=>p.id===pid)).filter(Boolean);
+    }
+
+    function renderCartLines(){
+      const box = $("#cartLines");
+      if(!box) return;
+      box.innerHTML = cartLines.length===0
+        ? '<div style="text-align:center;color:var(--muted);font-size:12.5px;padding:14px 0;">السلة فاضية — ضيف أصناف من فوق</div>'
+        : cartLines.map((l,idx)=>`
+          <div class="cart-line">
+            <div class="entry-main"><div class="name">${escapeHtml(l.name)}</div><div class="meta">${fmt(l.price)} / قطعة</div></div>
+            <div class="qty-stepper">
+              <button type="button" data-qty-minus="${idx}">−</button>
+              <input type="number" min="1" value="${l.qty}" data-qty-input="${idx}">
+              <button type="button" data-qty-plus="${idx}">+</button>
+            </div>
+            <div class="amt">${fmt(l.qty*l.price)}</div>
+            <button type="button" class="icon-btn" data-remove-line="${idx}">✕</button>
+          </div>`).join("");
+      const total = cartLines.reduce((a,l)=>a+l.qty*l.price,0);
+      $("#cartTotal").textContent = fmt(total);
+      updateRemaining(total);
+    }
+    function updateRemaining(total){
+      const t = total!==undefined ? total : cartLines.reduce((a,l)=>a+l.qty*l.price,0);
+      const paidInput = $("#o-amountpaid");
+      const paid = paidInput ? (Number(paidInput.value)||0) : 0;
+      const remEl = $("#remainingAmt");
+      if(remEl) remEl.textContent = fmt(Math.max(0, t-paid));
+    }
+    function renderItemsGrid(filterText){
+      const wrap = $("#itemsGridWrap");
+      if(!wrap) return;
+      const q = (filterText||"").trim().toLowerCase();
+      const inCartQty = {};
+      cartLines.forEach(l=>{ if(l.productId) inCartQty[l.productId] = (inCartQty[l.productId]||0)+l.qty; });
+      const cardHtml = (p)=>{
+        const qtyInCart = inCartQty[p.id]||0;
+        return `<div class="item-card ${qtyInCart?'in-cart':''}" data-add-product="${p.id}">${qtyInCart?`<span class="badge-qty">${qtyInCart}</span>`:""}<div class="nm">${escapeHtml(p.name)}</div><div class="pr">${fmt(p.price)}</div></div>`;
+      };
+      if(q){
+        const matches = products.filter(p=>p.name.toLowerCase().includes(q));
+        wrap.innerHTML = `<div class="items-grid">${matches.map(cardHtml).join("") || '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:14px;">ما فيه نتائج</div>'}</div>`;
+      } else {
+        const cats = {};
+        products.forEach(p=>{ (cats[p.category||"أخرى"]=cats[p.category||"أخرى"]||[]).push(p); });
+        wrap.innerHTML = Object.keys(cats).map(cat=>`<div class="category-title" style="margin-top:8px;">${escapeHtml(cat)}</div><div class="items-grid">${cats[cat].map(cardHtml).join("")}</div>`).join("");
+      }
+      const fr = $("#favRow"); if(fr) fr.classList.toggle("hidden", !!q);
+    }
+    function addProductToCart(pid){
+      const p = products.find(x=>x.id===pid);
+      if(!p) return;
+      const ex = cartLines.find(l=>l.productId===pid);
+      if(ex) ex.qty += 1; else cartLines.push({productId:p.id, name:p.name, qty:1, price:p.price, cost:p.cost});
+      renderCartLines();
+      renderItemsGrid($("#itemSearch").value);
+    }
+
+    function buildBody(){
+      const favs = favoriteProducts();
+      $("#orderScreenBody").innerHTML = `
+        <div class="field">
+          <label>نوع الاستلام</label>
+          <div class="segmented" id="orderTimingSeg">
+            <button type="button" data-timing="today" class="${orderTiming==='today'?'active':''}">⚡ استلام اليوم</button>
+            <button type="button" data-timing="scheduled" class="${orderTiming==='scheduled'?'active':''}">🗓️ طلب مجدول</button>
+          </div>
+        </div>
+        <div id="scheduleBox" class="${orderTiming==='scheduled'?'':'hidden'}" style="margin-bottom:4px;">
+          <div class="field"><label>تاريخ الاستلام</label><input type="date" id="o-pickup-date" value="${pickupDateVal}"></div>
+          <div class="field"><label>وقت الاستلام (اختياري)</label><input type="time" id="o-pickup-time" value="${pickupTimeVal}"></div>
+        </div>
+        <div class="field"><label>العميل</label>
+          <div class="segmented" id="custModeSeg">
+            <button type="button" data-mode="direct" class="${customerMode==='direct'?'active':''}">🚶 مباشر</button>
+            <button type="button" data-mode="registered" class="${customerMode==='registered'?'active':''}">📇 مسجل</button>
+            <button type="button" data-mode="temporary" class="${customerMode==='temporary'?'active':''}">✏️ مؤقت</button>
+          </div>
+        </div>
+        <div id="custRegisteredBox" class="${customerMode==='registered'?'':'hidden'}" style="margin-bottom:14px;">
+          <select id="o-customer"><option value="">اختر عميل...</option>${customerOptionsHtml(selectedCustomerId)}</select>
+          <button type="button" class="btn-add" id="newCustomerToggle" style="margin-top:8px;background:var(--purple-light);color:var(--purple);box-shadow:none;">＋ عميل جديد</button>
+          <div id="newCustomerBox" class="hidden mini-box" style="background:var(--purple-light);margin-top:10px;">
+            <div class="field"><label>الاسم</label><input type="text" id="nc-name"></div>
+            <div class="field"><label>النوع</label><select id="nc-type"><option value="cafe">☕ كافيه</option><option value="individual">🧍 فرد</option></select></div>
+            <div class="field"><label>رقم الجوال (اختياري)</label><input type="text" id="nc-phone"></div>
+            <button type="button" class="btn btn-primary" id="nc-add" style="width:100%;">إضافة واختيار</button>
+          </div>
+        </div>
+        <div id="custTemporaryBox" class="${customerMode==='temporary'?'':'hidden'}" style="margin-bottom:14px;">
+          <input type="text" id="o-tempname" placeholder="اسم العميل (يظهر بالفاتورة بس ما يُحفظ)" value="${escapeHtml(temporaryName)}">
+        </div>
+
+        <input type="text" id="itemSearch" class="search-box" placeholder="🔍 ابحث عن صنف">
+        <div id="favRow" class="fav-row">${favs.map(p=>`<div class="fav-chip" data-add-product="${p.id}"><div class="nm">${escapeHtml(p.name)}</div><div class="pr">${fmt(p.price)}</div></div>`).join("")}</div>
+        <div id="itemsGridWrap"></div>
+
+        <div class="mini-actions-row">
+          <button type="button" class="btn btn-secondary" id="showQuickProduct">✨ صنف جديد</button>
+          <button type="button" class="btn btn-secondary" id="showManualLine">📝 بند يدوي</button>
+        </div>
+        <div id="quickProductBox" class="hidden mini-box" style="background:var(--gold-light);">
+          <div class="field"><label>اسم الصنف الجديد</label><input type="text" id="qp-name"></div>
+          <div class="field"><label>الفئة</label><input type="text" id="qp-cat" list="cat-list"></div>
+          <div class="field"><label>سعر البيع</label><input type="number" id="qp-price" min="0" step="0.001"></div>
+          <div class="field"><label>تكلفة القطعة</label><input type="number" id="qp-cost" min="0" step="0.001" value="0"></div>
+          <button type="button" class="btn btn-primary" id="qp-add" style="width:100%;">أضف الصنف وأدرجه</button>
+        </div>
+        <div id="manualLineBox" class="hidden mini-box" style="background:#EEF0F5;">
+          <div class="field"><label>الوصف</label><input type="text" id="ml-desc"></div>
+          <div class="field"><label>الكمية</label><input type="number" id="ml-qty" value="1" min="1" step="1"></div>
+          <div class="field"><label>السعر الإجمالي للبند</label><input type="number" id="ml-price" min="0" step="0.001"></div>
+          <div class="field"><label>تكلفة تقديرية (اختياري)</label><input type="number" id="ml-cost" min="0" step="0.001" value="0"></div>
+          <button type="button" class="btn btn-primary" id="ml-add" style="width:100%;">أضف البند</button>
+        </div>
+        <datalist id="cat-list">${DEFAULT_CATEGORIES.map(c=>`<option value="${c}">`).join("")}</datalist>
+
+        <div class="section-title">🛒 السلة</div>
+        <div id="cartLines"></div>
+        <div class="live-total"><span>الإجمالي</span><span id="cartTotal">0.000 ر.ع</span></div>
+
+        <div class="field"><label>ملاحظات (اختياري)</label><input type="text" id="o-notes" placeholder="أي تفاصيل إضافية عن الطلب" value="${escapeHtml(notesVal)}"></div>
+
+        <div class="field"><label>حالة الدفع</label>
+          <div class="segmented" id="paySeg">
+            <button type="button" data-pay="paid" class="${paymentStatus==='paid'?'active':''}">مدفوع</button>
+            <button type="button" data-pay="credit" class="${paymentStatus==='credit'?'active':''}">آجل</button>
+            <button type="button" data-pay="partial" class="${paymentStatus==='partial'?'active':''}">جزئيًا</button>
+          </div>
+        </div>
+        <div id="partialBox" class="${paymentStatus==='partial'?'':'hidden'}">
+          <div class="field"><label>المبلغ المدفوع</label><input type="number" id="o-amountpaid" min="0" step="0.001" value="${existing&&existing.amountPaid?existing.amountPaid:''}"></div>
+          <div class="live-total" style="background:var(--red-light);color:var(--red);"><span>المتبقي</span><span id="remainingAmt">0.000 ر.ع</span></div>
+        </div>
+        <div class="field ${paymentStatus==='credit'?'hidden':''}" id="methodBox">
+          <label>طريقة الدفع</label>
+          <div class="segmented" id="methodSeg">
+            <button type="button" data-method="cash" class="${paymentMethod==='cash'?'active':''}">كاش</button>
+            <button type="button" data-method="card" class="${paymentMethod==='card'?'active':''}">بطاقة</button>
+            <button type="button" data-method="transfer" class="${paymentMethod==='transfer'?'active':''}">تحويل</button>
+          </div>
+        </div>
+      `;
+      wireBody();
+    }
+
+    function wireBody(){
+      renderItemsGrid("");
+      renderCartLines();
+      $("#itemSearch").addEventListener("input", (e)=> renderItemsGrid(e.target.value));
+
+      $("#orderTimingSeg").addEventListener("click", (e)=>{
+        const btn = e.target.closest("button[data-timing]"); if(!btn) return;
+        orderTiming = btn.dataset.timing;
+        $all("button[data-timing]", $("#orderTimingSeg")).forEach(b=>b.classList.toggle("active", b===btn));
+        $("#scheduleBox").classList.toggle("hidden", orderTiming!=="scheduled");
+        if(orderTiming==="today"){
+          $("#o-pickup-date").value = todayStr();
+          $("#o-pickup-time").value = "";
+        }
+      });
+
+      $("#orderScreenBody").addEventListener("click", (e)=>{
+        const addBtn = e.target.closest("[data-add-product]");
+        if(addBtn){ addProductToCart(addBtn.dataset.addProduct); return; }
+        const minus = e.target.closest("[data-qty-minus]");
+        if(minus){ const idx=Number(minus.dataset.qtyMinus); if(cartLines[idx].qty<=1) cartLines.splice(idx,1); else cartLines[idx].qty--; renderCartLines(); renderItemsGrid($("#itemSearch").value); return; }
+        const plus = e.target.closest("[data-qty-plus]");
+        if(plus){ const idx=Number(plus.dataset.qtyPlus); cartLines[idx].qty++; renderCartLines(); renderItemsGrid($("#itemSearch").value); return; }
+        const rm = e.target.closest("[data-remove-line]");
+        if(rm){ cartLines.splice(Number(rm.dataset.removeLine),1); renderCartLines(); renderItemsGrid($("#itemSearch").value); return; }
+      });
+      $("#orderScreenBody").addEventListener("change", (e)=>{
+        const qtyInput = e.target.closest("[data-qty-input]");
+        if(qtyInput){ const idx=Number(qtyInput.dataset.qtyInput); cartLines[idx].qty = Math.max(1, Number(qtyInput.value)||1); renderCartLines(); }
+      });
+
+      $("#custModeSeg").addEventListener("click", (e)=>{
+        const btn = e.target.closest("button[data-mode]"); if(!btn) return;
+        customerMode = btn.dataset.mode;
+        $all("button[data-mode]", $("#custModeSeg")).forEach(b=>b.classList.toggle("active", b===btn));
+        $("#custRegisteredBox").classList.toggle("hidden", customerMode!=="registered");
+        $("#custTemporaryBox").classList.toggle("hidden", customerMode!=="temporary");
+      });
+      $("#newCustomerToggle").addEventListener("click", ()=> $("#newCustomerBox").classList.toggle("hidden"));
+      $("#nc-add").addEventListener("click", async ()=>{
+        const name = $("#nc-name").value.trim();
+        if(!name) return;
+        const rec = {id:uid(), name, type:$("#nc-type").value, phone:$("#nc-phone").value.trim(), notes:""};
+        customers.push(rec);
+        await persist();
+        $("#o-customer").innerHTML = '<option value="">اختر عميل...</option>' + customerOptionsHtml(rec.id);
+        $("#newCustomerBox").classList.add("hidden");
+      });
+
+      $("#showQuickProduct").addEventListener("click", ()=> $("#quickProductBox").classList.toggle("hidden"));
+      $("#showManualLine").addEventListener("click", ()=> $("#manualLineBox").classList.toggle("hidden"));
+      $("#qp-add").addEventListener("click", async ()=>{
+        const name = $("#qp-name").value.trim();
+        const price = Number($("#qp-price").value);
+        if(!name || !price || price<=0){ $("#qp-name").focus(); return; }
+        const cost = Number($("#qp-cost").value)||0;
+        const matchedStock=finishedInventory.find(x=>x.name.trim()===name.trim()); const newProduct = {id:uid(), name, category:$("#qp-cat").value.trim()||"أخرى", price:+price.toFixed(3), cost:+cost.toFixed(3), stockItemId:matchedStock?matchedStock.id:null};
+        products.push(newProduct);
+        await persist();
+        cartLines.push({productId:newProduct.id, name:newProduct.name, qty:1, price:newProduct.price, cost:newProduct.cost});
+        renderCartLines(); renderItemsGrid($("#itemSearch").value);
+        $("#qp-name").value=""; $("#qp-cat").value=""; $("#qp-price").value=""; $("#qp-cost").value="0";
+        $("#quickProductBox").classList.add("hidden");
+      });
+      $("#ml-add").addEventListener("click", ()=>{
+        const desc = $("#ml-desc").value.trim();
+        const total = Number($("#ml-price").value);
+        if(!desc || !total || total<=0){ $("#ml-desc").focus(); return; }
+        const q = Math.max(1, Number($("#ml-qty").value)||1);
+        const costTotal = Number($("#ml-cost").value)||0;
+        cartLines.push({productId:null, name:desc, qty:q, price:+(total/q).toFixed(3), cost:+(costTotal/q).toFixed(3)});
+        renderCartLines();
+        $("#ml-desc").value=""; $("#ml-price").value=""; $("#ml-cost").value="0"; $("#ml-qty").value="1";
+        $("#manualLineBox").classList.add("hidden");
+      });
+
+      $("#paySeg").addEventListener("click", (e)=>{
+        const btn = e.target.closest("button[data-pay]"); if(!btn) return;
+        paymentStatus = btn.dataset.pay;
+        $all("button[data-pay]", $("#paySeg")).forEach(b=>b.classList.toggle("active", b===btn));
+        $("#partialBox").classList.toggle("hidden", paymentStatus!=="partial");
+        $("#methodBox").classList.toggle("hidden", paymentStatus==="credit");
+        updateRemaining();
+      });
+      const paidInput = $("#o-amountpaid");
+      if(paidInput) paidInput.addEventListener("input", ()=> updateRemaining());
+      $("#methodSeg").addEventListener("click", (e)=>{
+        const btn = e.target.closest("button[data-method]"); if(!btn) return;
+        paymentMethod = btn.dataset.method;
+        $all("button[data-method]", $("#methodSeg")).forEach(b=>b.classList.toggle("active", b===btn));
+      });
+    }
+
+    buildBody();
+
+    $("#orderCancelBtn").onclick = closeOrderScreen;
+    $("#closeOrderBtn").onclick = closeOrderScreen;
+    $("#orderSaveBtn").onclick = async ()=>{
+      if(cartLines.length===0){ alert("أضف صنف واحد على الأقل للفاتورة"); return; }
+      let customerId = null, customerName = "";
+      if(customerMode==="registered"){
+        customerId = $("#o-customer").value || null;
+        if(!customerId){ alert("اختر عميل مسجل، أو غيّر نوع العميل"); return; }
+        const c = customers.find(x=>x.id===customerId);
+        customerName = c ? c.name : "";
+      } else if(customerMode==="temporary"){
+        customerName = $("#o-tempname").value.trim();
+      }
+      const items = cartLines.map(l=>({productId:l.productId, name:l.name, qty:l.qty, price:+l.price.toFixed(3), cost:+l.cost.toFixed(3), lineTotal:+(l.qty*l.price).toFixed(3), lineCost:+(l.qty*l.cost).toFixed(3)}));
+      const total = items.reduce((a,it)=>a+it.lineTotal,0);
+      const costTotal = items.reduce((a,it)=>a+it.lineCost,0);
+      let amountPaidFinal = 0;
+      if(paymentStatus==="paid") amountPaidFinal = total;
+      else if(paymentStatus==="partial") amountPaidFinal = Math.min(total, Number(($("#o-amountpaid")||{}).value)||0);
+
+      const selectedPickupDate = orderTiming==="scheduled" ? ($("#o-pickup-date").value || todayStr()) : todayStr();
+      const selectedPickupTime = orderTiming==="scheduled" ? ($("#o-pickup-time").value || "") : "";
+      let finalOrderStatus = existing ? existing.orderStatus : "new";
+      // إذا أدخلت فاتورة قديمة بعد ما كنت مسلّمها، نسألك بدل ما نعتبرها متأخرة تلقائيًا.
+      if(selectedPickupDate < todayStr() && finalOrderStatus !== "delivered"){
+        const wasDelivered = confirm("موعد هذا الطلب بتاريخ سابق.\n\nاضغط «موافق» إذا الطلب تم تسليمه في وقته.\nاضغط «إلغاء» إذا الطلب ما زال غير مسلّم ويجب أن يظهر كمتأخر.");
+        if(wasDelivered) finalOrderStatus = "delivered";
+      }
+
+      const rec = {
+        id: existing ? existing.id : uid(),
+        invoiceNo: existing ? existing.invoiceNo : generateInvoiceNo(todayStr()),
+        date: existing ? existing.date : todayStr(),
+        pickupDate: selectedPickupDate,
+        pickupTime: selectedPickupTime,
+        notes: $("#o-notes").value.trim(),
+        customerId, customerName, items,
+        total: +total.toFixed(3), costTotal: +costTotal.toFixed(3), profit: +(total-costTotal).toFixed(3),
+        paymentStatus, paymentMethod: paymentStatus==="credit" ? null : paymentMethod,
+        amountPaid: +amountPaidFinal.toFixed(3),
+        orderStatus: finalOrderStatus,
+        stockDeducted:false, stockEffects:[],
+        createdAt: existing ? existing.createdAt : Date.now()
+      };
+      const finSnapshot=deepClone(finishedInventory), moveSnapshot=deepClone(stockMovements);
+      const maintainMode = existing ? !!existing.stockDeducted : !!appSettings.autoDeductSales;
+      if(existing&&existing.stockDeducted) restoreInvoiceStock(existing,"تعديل "+(existing.invoiceNo||"فاتورة"));
+      if(!deductInvoiceStock(rec,maintainMode)){ finishedInventory=finSnapshot; stockMovements=moveSnapshot; return; }
+      if(existing){ const idx=invoices.findIndex(i=>i.id===existing.id); invoices[idx]=rec; } else invoices.push(rec);
+      await persist();
+      closeOrderScreen();
+      render();
+    };
+  }
+
+  // ---------- Print / share ----------
+  async function shareText(title, text){
+    if(navigator.share){
+      try{ await navigator.share({title, text}); }catch(e){}
+    } else if(navigator.clipboard){
+      try{ await navigator.clipboard.writeText(text); alert("تم نسخ التفاصيل، الصقها بواتساب أو أي تطبيق."); }catch(e){ alert(text); }
+    } else { alert(text); }
+  }
+
+  function openInvoicePrint(invoiceId){
+    const inv = invoices.find(i=>i.id===invoiceId);
+    if(!inv) return;
+    const custName = inv.customerId ? ((customers.find(c=>c.id===inv.customerId)||{}).name||"") : (inv.customerName||"");
+    const rows = inv.items.map(it=>`<tr><td>${escapeHtml(it.name)}</td><td>${it.qty}</td><td>${fmt(it.price)}</td><td>${fmt(it.lineTotal)}</td></tr>`).join("");
+    const remaining = inv.paymentStatus==="partial" ? inv.total-(inv.amountPaid||0) : 0;
+    const showPickup = inv.pickupDate && inv.pickupDate!==inv.date;
+    $("#printContent").innerHTML = `
+      <div class="inv-header">${logoSvg(38)}<div class="brandname" style="margin-top:6px;">Cakeyard</div><div class="sub">فاتورة ${escapeHtml(inv.invoiceNo||"")}</div></div>
+      <div class="inv-meta">
+        <div>${custName?("<b>"+escapeHtml(custName)+"</b>"):"بيع مباشر"}</div>
+        <div>${fmtDateHeading(inv.date)}</div>
+      </div>
+      ${showPickup ? `<div class="inv-meta" style="border-bottom:none;margin-bottom:8px;padding-bottom:0;"><div>موعد الاستلام</div><div>${relativeLabel(inv.pickupDate)}${inv.pickupTime?" ⏰ "+inv.pickupTime:""}</div></div>` : ""}
+      <table class="inv-table"><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="inv-total-row"><span>الإجمالي</span><span>${fmt(inv.total)}</span></div>
+      <div style="margin-top:10px;font-size:13px;display:flex;justify-content:space-between;"><span>حالة الطلب</span><span class="pill ${inv.orderStatus}">${ORDER_STATUS_LABELS[inv.orderStatus]}</span></div>
+      <div style="margin-top:6px;font-size:13px;display:flex;justify-content:space-between;"><span>حالة الدفع</span><span class="pill ${inv.paymentStatus}">${PAYMENT_STATUS_LABELS[inv.paymentStatus]}</span></div>
+      ${inv.paymentStatus==="partial" ? `<div style="margin-top:6px;font-size:13px;display:flex;justify-content:space-between;"><span>المبلغ المدفوع</span><span>${fmt(inv.amountPaid||0)}</span></div><div style="margin-top:6px;font-size:13px;display:flex;justify-content:space-between;color:var(--red);font-weight:800;"><span>المتبقي</span><span>${fmt(remaining)}</span></div>` : ""}
+      ${inv.notes ? `<div style="margin-top:14px;padding-top:10px;border-top:1px dashed var(--border);font-size:12.5px;"><b>ملاحظات:</b> ${escapeHtml(inv.notes)}</div>` : ""}
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);">تاريخ الإصدار: ${fmtHeaderToday()}</div>
+    `;
+    $("#printView").classList.remove("hidden");
+    $("#closePrintBtn").onclick = ()=> $("#printView").classList.add("hidden");
+    $("#doPrintBtn").onclick = ()=> window.print();
+    $("#sharePrintBtn").onclick = ()=>{
+      const lines = inv.items.map(it=>`${it.name} × ${it.qty} = ${fmt(it.lineTotal)}`).join("\n");
+      const text = `فاتورة ${inv.invoiceNo||""} — Cakeyard\n${custName?("العميل: "+custName+"\n"):""}التاريخ: ${inv.date}${showPickup?("\nموعد الاستلام: "+relativeLabel(inv.pickupDate)+(inv.pickupTime?" "+inv.pickupTime:"")):""}\n\n${lines}\n\nالإجمالي: ${fmt(inv.total)}\nحالة الدفع: ${PAYMENT_STATUS_LABELS[inv.paymentStatus]}`;
+      shareText("فاتورة "+(inv.invoiceNo||""), text);
+    };
+  }
+
+  function openStatement(customerId, fromDate, toDate){
+    const cust = customers.find(c=>c.id===customerId);
+    const list = invoices.filter(inv=>inv.customerId===customerId && inv.date>=fromDate && inv.date<=toDate).sort((a,b)=>a.date.localeCompare(b.date));
+    let rows = "", grandTotal = 0;
+    list.forEach(inv=>{
+      inv.items.forEach(it=>{ rows += `<tr><td>${fmtDateHeading(inv.date)}</td><td>${escapeHtml(it.name)}</td><td>${it.qty}</td><td>${fmt(it.price)}</td><td>${fmt(it.lineTotal)}</td></tr>`; });
+      grandTotal += inv.total;
+    });
+    $("#printContent").innerHTML = `
+      <div class="inv-header">${logoSvg(38)}<div class="brandname" style="margin-top:6px;">Cakeyard</div><div class="sub">كشف حساب</div></div>
+      <div class="inv-meta"><div><b>${escapeHtml(cust?cust.name:"—")}</b>${cust&&cust.phone?" · "+escapeHtml(cust.phone):""}</div><div>${fromDate} — ${toDate}</div></div>
+      <table class="inv-table"><thead><tr><th>التاريخ</th><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:20px;">لا توجد فواتير بهذي الفترة</td></tr>'}</tbody></table>
+      <div class="inv-total-row"><span>الإجمالي الكلي</span><span>${fmt(grandTotal)}</span></div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);">تاريخ الإصدار: ${fmtHeaderToday()}</div>
+    `;
+    $("#printView").classList.remove("hidden");
+    $("#closePrintBtn").onclick = ()=> $("#printView").classList.add("hidden");
+    $("#doPrintBtn").onclick = ()=> window.print();
+    $("#sharePrintBtn").onclick = ()=>{
+      const text = `كشف حساب — Cakeyard\n${cust?cust.name:""}\nالفترة: ${fromDate} — ${toDate}\n\nالإجمالي الكلي: ${fmt(grandTotal)}`;
+      shareText("كشف حساب", text);
+    };
+  }
+
+  // ---------- Expense / Product / Customer forms ----------
+  function openExpenseForm(id){
+    const existing = id ? expenses.find(e=>e.id===id) : null;
+    openSheet(`
+      <div class="sheet-handle"></div><h3>${existing ? "تعديل مصروف" : "تسجيل مصروف جديد"}</h3>
+      <div class="field"><label>التاريخ</label><input type="date" id="f-date" value="${existing?existing.date:todayStr()}"></div>
+      <div class="field"><label>نوع المصروف</label><select id="f-type">${EXPENSE_TYPES.map(t=>`<option value="${t}" ${existing&&existing.type===t?"selected":""}>${t}</option>`).join("")}</select></div>
+      <div class="field"><label>البيان</label><input type="text" id="f-desc" placeholder="مثال: فاتورة كهرباء" value="${existing?escapeHtml(existing.desc||""):""}"></div>
+      <div class="field"><label>القيمة (ر.ع)</label><input type="number" id="f-value" min="0" step="0.001" value="${existing?existing.value:""}"></div>
+      <div class="sheet-actions"><button class="btn btn-secondary" id="cancelBtn">إلغاء</button><button class="btn btn-primary" id="saveExpenseBtn">${existing?"حفظ التعديل":"حفظ"}</button></div>
+      ${existing ? '<button class="btn btn-danger" id="deleteFromFormBtn" style="width:100%;margin-top:10px;">حذف هذا المصروف</button>' : ""}
+    `);
+    $("#cancelBtn").addEventListener("click", closeSheet);
+    $("#saveExpenseBtn").addEventListener("click", async ()=>{
+      const val = Number($("#f-value").value);
+      if(!val || val<=0){ $("#f-value").focus(); return; }
+      const rec = {id: existing?existing.id:uid(), date: $("#f-date").value||todayStr(), type: $("#f-type").value, desc: $("#f-desc").value.trim(), value:+val.toFixed(3), createdAt: existing?existing.createdAt:Date.now()};
+      if(existing){ const idx=expenses.findIndex(e=>e.id===existing.id); expenses[idx]=rec; } else expenses.push(rec);
+      await persist(); closeSheet(); render();
+    });
+    if(existing){
+      $("#deleteFromFormBtn").addEventListener("click", async ()=>{
+        if(!confirm("تأكيد حذف هذا المصروف؟")) return;
+        expenses = expenses.filter(e=>e.id!==existing.id);
+        await persist(); closeSheet(); render();
+      });
+    }
+  }
+
+  function openProductForm(id){
+    const existing = id ? products.find(p=>p.id===id) : null;
+    openSheet(`
+      <div class="sheet-handle"></div><h3>${existing ? "تعديل صنف" : "إضافة صنف جديد"}</h3>
+      <div class="field"><label>اسم المنتج</label><input type="text" id="f-name" value="${existing?escapeHtml(existing.name):""}"></div>
+      <div class="field"><label>الفئة</label><input type="text" id="f-cat" list="cat-list2" value="${existing?escapeHtml(existing.category||""):""}"><datalist id="cat-list2">${DEFAULT_CATEGORIES.map(c=>`<option value="${c}">`).join("")}</datalist></div>
+      <div class="field"><label>سعر البيع (ر.ع)</label><input type="number" id="f-price" min="0" step="0.001" value="${existing?existing.price:""}"></div>
+      <div class="field"><label>تكلفة القطعة (ر.ع)</label><input type="number" id="f-cost" min="0" step="0.001" value="${existing?existing.cost:""}"></div>
+      <div class="field"><label>ربط بمخزون المنتج الجاهز</label><select id="f-stock"><option value="">بدون ربط</option>${finishedInventory.map(x=>`<option value="${x.id}" ${existing&&existing.stockItemId===x.id?"selected":""}>${escapeHtml(x.name)}</option>`).join("")}</select></div>
+      <div class="sheet-actions"><button class="btn btn-secondary" id="cancelBtn">إلغاء</button><button class="btn btn-primary" id="saveProductBtn">${existing?"حفظ التعديل":"حفظ"}</button></div>
+      ${existing ? '<button class="btn btn-danger" id="deleteFromFormBtn" style="width:100%;margin-top:10px;">حذف هذا الصنف</button>' : ""}
+    `);
+    $("#cancelBtn").addEventListener("click", closeSheet);
+    $("#saveProductBtn").addEventListener("click", async ()=>{
+      const name = $("#f-name").value.trim();
+      if(!name){ $("#f-name").focus(); return; }
+      const rec = {id: existing?existing.id:uid(), name, category: $("#f-cat").value.trim()||"أخرى", price:+(Number($("#f-price").value)||0).toFixed(3), cost:+(Number($("#f-cost").value)||0).toFixed(3), stockItemId:$("#f-stock").value||null};
+      if(existing){ const idx=products.findIndex(p=>p.id===existing.id); products[idx]=rec; } else products.push(rec);
+      await persist(); closeSheet(); render();
+    });
+    if(existing){
+      $("#deleteFromFormBtn").addEventListener("click", async ()=>{
+        if(!confirm("تأكيد حذف هذا الصنف؟")) return;
+        products = products.filter(p=>p.id!==existing.id);
+        await persist(); closeSheet(); render();
+      });
+    }
+  }
+
+  function openCustomerForm(id){
+    const existing = id ? customers.find(c=>c.id===id) : null;
+    openSheet(`
+      <div class="sheet-handle"></div><h3>${existing?"تعديل عميل":"عميل جديد"}</h3>
+      <div class="field"><label>الاسم</label><input type="text" id="c-name" value="${existing?escapeHtml(existing.name):""}"></div>
+      <div class="field"><label>النوع</label><select id="c-type"><option value="cafe" ${existing&&existing.type==="cafe"?"selected":""}>☕ كافيه</option><option value="individual" ${!existing||existing.type==="individual"?"selected":""}>🧍 فرد</option></select></div>
+      <div class="field"><label>رقم الجوال (اختياري)</label><input type="text" id="c-phone" value="${existing&&existing.phone?escapeHtml(existing.phone):""}"></div>
+      <div class="field"><label>ملاحظات (اختياري)</label><input type="text" id="c-notes" value="${existing&&existing.notes?escapeHtml(existing.notes):""}"></div>
+      <div class="sheet-actions"><button class="btn btn-secondary" id="cancelBtn">إلغاء</button><button class="btn btn-primary" id="saveCustBtn">${existing?"حفظ التعديل":"حفظ"}</button></div>
+    `);
+    $("#cancelBtn").addEventListener("click", closeSheet);
+    $("#saveCustBtn").addEventListener("click", async ()=>{
+      const name = $("#c-name").value.trim();
+      if(!name){ $("#c-name").focus(); return; }
+      const rec = {id: existing?existing.id:uid(), name, type:$("#c-type").value, phone:$("#c-phone").value.trim(), notes:$("#c-notes").value.trim()};
+      if(existing){ const idx=customers.findIndex(c=>c.id===existing.id); customers[idx]=rec; } else customers.push(rec);
+      await persist(); closeSheet(); render();
+    });
+  }
+
+  function openCustomerDetail(id){
+    const cust = customers.find(c=>c.id===id);
+    if(!cust) return;
+    const custInvoices = invoices.filter(inv=>inv.customerId===id).sort((a,b)=>b.date.localeCompare(a.date));
+    const totalAll = custInvoices.reduce((a,i)=>a+i.total,0);
+    const unpaid = custInvoices.filter(i=>i.paymentStatus!=="paid").reduce((a,i)=> a + (i.paymentStatus==="partial" ? (i.total-(i.amountPaid||0)) : i.total), 0);
+    const today = todayStr(), monthStart = today.slice(0,7)+"-01";
+    openSheet(`
+      <div class="sheet-handle"></div><h3>${cust.type==="cafe"?"☕ ":"🧍 "}${escapeHtml(cust.name)}</h3>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="icon">🧾</span><div class="label">إجمالي الفواتير</div><div class="value">${fmt(totalAll)}</div></div>
+        <div class="stat-card expense"><span class="icon">⏳</span><div class="label">غير مدفوع</div><div class="value">${fmt(unpaid)}</div></div>
+      </div>
+      <div class="field"><label>من تاريخ</label><input type="date" id="stmt-from" value="${monthStart}"></div>
+      <div class="field"><label>إلى تاريخ</label><input type="date" id="stmt-to" value="${today}"></div>
+      <button class="btn btn-primary" id="genStatementBtn" style="width:100%;margin-bottom:16px;">🖨️ توليد كشف/فاتورة لهذي الفترة</button>
+      <div class="section-title" style="font-size:14px;">آخر الفواتير</div>
+      <div id="custInvoicesList">${
+        custInvoices.length===0 ? '<div class="empty-state" style="padding:20px;"><span class="emoji">🧾</span><span class="msg">ما فيه فواتير بعد</span></div>' :
+        custInvoices.slice(0,15).map(inv=>`
+          <div class="entry-row" data-open-invoice="${inv.id}" style="cursor:pointer;">
+            <div class="entry-main"><div class="entry-title">${escapeHtml(inv.invoiceNo||"")} · ${fmtDateHeading(inv.date)}</div><div class="entry-sub">${inv.items.length} صنف</div></div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+              <div class="entry-amount sale">${fmt(inv.total)}</div>
+              <span class="pill ${inv.paymentStatus}">${PAYMENT_STATUS_LABELS[inv.paymentStatus]}</span>
+            </div>
+          </div>`).join("")
+      }</div>
+      <div class="sheet-actions" style="margin-top:16px;"><button class="btn btn-secondary" id="editCustBtn">✏️ تعديل البيانات</button><button class="btn btn-danger" id="delCustBtn">🗑️ حذف</button></div>
+    `);
+    $("#genStatementBtn").addEventListener("click", ()=>{
+      const from = $("#stmt-from").value, to = $("#stmt-to").value;
+      closeSheet();
+      setTimeout(()=>openStatement(id, from, to), 220);
+    });
+    $("#editCustBtn").addEventListener("click", ()=>{ closeSheet(); setTimeout(()=>openCustomerForm(id),220); });
+    $("#delCustBtn").addEventListener("click", async ()=>{
+      if(!confirm("حذف هذا العميل؟ الفواتير القديمة بتبقى محفوظة بس بدون ربط بعميل.")) return;
+      customers = customers.filter(c=>c.id!==id);
+      invoices.forEach(inv=>{ if(inv.customerId===id) inv.customerId=null; });
+      await persist(); closeSheet(); render();
+    });
+  }
+
+  function openBackupSheet(){
+    openSheet(`
+      <div class="sheet-handle"></div><h3>الإعدادات والنسخ الاحتياطي</h3>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin:-6px 0 18px;">بياناتك محفوظة في Supabase. وتقدر تنزّل نسخة محلية إضافية متى ما تريد.</p>
+      <div class="setting-row"><div><div class="st">خصم المخزون عند البيع</div><div class="ss">يمكن تغييره أيضًا من صفحة المخزون.</div></div><label class="switch"><input type="checkbox" id="settingsAutoSales" ${appSettings.autoDeductSales?"checked":""}><span class="slider"></span></label></div><div class="setting-row" style="margin-bottom:14px;"><div><div class="st">خصم المواد عند الإنتاج</div><div class="ss">يخصم مكونات الوصفة تلقائيًا عند تنفيذ الإنتاج.</div></div><label class="switch"><input type="checkbox" id="settingsAutoProd" ${appSettings.autoDeductProduction?"checked":""}><span class="slider"></span></label></div><button class="btn btn-primary" id="exportBtn" style="width:100%;margin-bottom:10px;">⬇️ تنزيل نسخة احتياطية</button>
+      <label class="btn btn-secondary" style="width:100%;display:block;text-align:center;cursor:pointer;margin-bottom:10px;">⬆️ استيراد نسخة احتياطية<input type="file" id="importFile" accept="application/json" style="display:none;"></label>
+      <button class="btn btn-secondary" id="logoutBtn" style="width:100%;">🚪 تسجيل الخروج من هذا الجهاز</button>
+    `);
+    $("#settingsAutoSales").onchange=async e=>{appSettings.autoDeductSales=e.target.checked;await persist();}; $("#settingsAutoProd").onchange=async e=>{appSettings.autoDeductProduction=e.target.checked;await persist();};
+    $("#logoutBtn").addEventListener("click", async ()=>{
+      if(!confirm("تسجيل الخروج من Cakeyard على هذا الجهاز؟")) return;
+      await sb.auth.signOut();
+      location.reload();
+    });
+    $("#exportBtn").addEventListener("click", ()=>{
+      const data = {products, invoices, expenses, customers, rawInventory, finishedInventory, recipes, stockMovements, appSettings, exportedAt:new Date().toISOString()};
+      const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href=url; a.download="cakeyard-backup-"+todayStr()+".json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    });
+    $("#importFile").addEventListener("change", (e)=>{
+      const file = e.target.files[0]; if(!file) return;
+      const reader = new FileReader();
+      reader.onload = async ()=>{
+        try{
+          const data = JSON.parse(reader.result);
+          if(!confirm("استيراد هذه النسخة سيستبدل كل البيانات الحالية. متابعة؟")) return;
+          if(Array.isArray(data.products)) products = data.products;
+          if(Array.isArray(data.invoices)) invoices = data.invoices;
+          if(Array.isArray(data.expenses)) expenses = data.expenses;
+          if(Array.isArray(data.customers)) customers = data.customers;
+          if(Array.isArray(data.rawInventory)) rawInventory = data.rawInventory;
+          if(Array.isArray(data.finishedInventory)) finishedInventory = data.finishedInventory;
+          if(Array.isArray(data.recipes)) recipes = data.recipes;
+          if(Array.isArray(data.stockMovements)) stockMovements = data.stockMovements;
+          if(data.appSettings) appSettings = {...appSettings,...data.appSettings};
+          backfillInvoiceFields(); backfillOperationsData({rawInventory,finishedInventory,recipes,stockMovements,appSettings});
+          await persist(); closeSheet(); render();
+        }catch(err){ alert("تعذّر قراءة الملف، تأكد أنه نسخة احتياطية صحيحة"); }
+      };
+      reader.readAsText(file);
+    });
+  }
+
+  // ---------- Event delegation ----------
+  document.addEventListener("click", (e)=>{
+    const navBtn = e.target.closest("nav.bottom-nav button");
+    if(navBtn){ switchTab(navBtn.dataset.tab); return; }
+    const moreTarget=e.target.closest("[data-more-target]"); if(moreTarget){switchTab(moreTarget.dataset.moreTarget);return;}
+    if(e.target.closest("#moreSettingsBtn")){openBackupSheet();return;}
+
+    const segBtn = e.target.closest("#periodSeg button");
+    if(segBtn){
+      currentPeriod = segBtn.dataset.period;
+      $all("#periodSeg button").forEach(b=>b.classList.toggle("active", b===segBtn));
+      $("#monthPickerWrap").style.display = currentPeriod==="month" ? "block" : "none";
+      renderDashboard();
+      return;
+    }
+
+    const upSegBtn = e.target.closest("#upcomingSeg button");
+    if(upSegBtn){
+      upcomingFilter = upSegBtn.dataset.upcoming;
+      $all("#upcomingSeg button").forEach(b=>b.classList.toggle("active", b===upSegBtn));
+      renderUpcomingOrders();
+      return;
+    }
+
+    const dayOrders = e.target.closest("[data-open-day-orders]");
+    if(dayOrders){ openDayOrders(dayOrders.dataset.openDayOrders); return; }
+
+    const invSeg=e.target.closest("#inventorySeg button");
+    if(invSeg){inventoryMode=invSeg.dataset.inventory;$all("#inventorySeg button").forEach(b=>b.classList.toggle("active",b===invSeg));renderInventory();return;}
+    const goStock=e.target.closest("[data-go-stock]");if(goStock){inventoryMode=goStock.dataset.goStock;switchTab("inventory");$all("#inventorySeg button").forEach(b=>b.classList.toggle("active",b.dataset.inventory===inventoryMode));return;}
+    const editStock=e.target.closest("[data-edit-stock]");if(editStock){const [type,id]=editStock.dataset.editStock.split(":");openStockForm(type,id);return;}
+    const adjStock=e.target.closest("[data-stock-adjust]");if(adjStock){const [type,id,sign]=adjStock.dataset.stockAdjust.split(":");openStockAdjust(type,id,Number(sign));return;}
+    const openRecipe=e.target.closest("[data-open-recipe]");if(openRecipe){openRecipeDetail(openRecipe.dataset.openRecipe);return;}
+
+    if(e.target.closest("#backupBtn")){ openBackupSheet(); return; }
+    if(e.target.closest("#newOrderBtnHome")){ openOrderScreen(null); return; }
+    if(e.target.closest("#addInvoiceBtn")){ openOrderScreen(null); return; }
+    if(e.target.closest("#addExpenseBtn")){ openExpenseForm(null); return; }
+    if(e.target.closest("#addProductBtn")){ openProductForm(null); return; }
+    if(e.target.closest("#addStockBtn")){ openStockForm(inventoryMode==="raw"?"raw":"finished",null); return; }
+    if(e.target.closest("#addRecipeBtn")){ openRecipeForm(null); return; }
+    if(e.target.closest("#addCustomerBtn")){ openCustomerForm(null); return; }
+
+    const openCust = e.target.closest("[data-open-customer]");
+    if(openCust){ openCustomerDetail(openCust.dataset.openCustomer); return; }
+
+    const statusPill = e.target.closest("[data-status-pill]");
+    if(statusPill){ openStatusPicker(statusPill.dataset.statusPill); return; }
+
+    const openInv = e.target.closest("[data-open-invoice]");
+    if(openInv){ const inv=invoices.find(i=>i.id===openInv.dataset.openInvoice); closeSheet(); if(inv) openOrderScreen(inv); return; }
+
+    const repeatBtn = e.target.closest("[data-repeat-invoice]");
+    if(repeatBtn){ const inv=invoices.find(i=>i.id===repeatBtn.dataset.repeatInvoice); if(inv) openOrderScreen(null, inv); return; }
+
+    const printBtn = e.target.closest("[data-print-invoice]");
+    if(printBtn){ openInvoicePrint(printBtn.dataset.printInvoice); return; }
+
+    const delInvoice = e.target.closest("[data-del-invoice]");
+    if(delInvoice){
+      if(confirm("تأكيد حذف هذه الفاتورة؟")){ const inv=invoices.find(i=>i.id===delInvoice.dataset.delInvoice); if(inv&&inv.stockDeducted) restoreInvoiceStock(inv,"حذف "+(inv.invoiceNo||"فاتورة")); invoices = invoices.filter(i=>i.id!==delInvoice.dataset.delInvoice); persist().then(render); }
+      return;
+    }
+
+    const editExpense = e.target.closest("[data-edit-expense]");
+    if(editExpense){ openExpenseForm(editExpense.dataset.editExpense); return; }
+    const delExpense = e.target.closest("[data-del-expense]");
+    if(delExpense){
+      if(confirm("تأكيد حذف هذا المصروف؟")){ expenses = expenses.filter(x=>x.id!==delExpense.dataset.delExpense); persist().then(render); }
+      return;
+    }
+
+    const editProduct = e.target.closest("[data-edit-product]");
+    if(editProduct){ openProductForm(editProduct.dataset.editProduct); return; }
+    const delProduct = e.target.closest("[data-del-product]");
+    if(delProduct){
+      if(confirm("تأكيد حذف هذا الصنف؟")){ products = products.filter(p=>p.id!==delProduct.dataset.delProduct); persist().then(render); }
+      return;
+    }
+  });
+  document.addEventListener("input", (e)=>{
+    if(e.target.id==="invoiceSearch") renderInvoices();
+    if(e.target.id==="productSearch") renderProducts();
+    if(e.target.id==="inventorySearch") renderInventory();
+    if(e.target.id==="recipeSearch") renderRecipes();
+  });
+
+  document.addEventListener("change", async (e)=>{
+    if(e.target.id==="autoDeductSalesToggle"){appSettings.autoDeductSales=e.target.checked;await persist();}
+    if(e.target.id==="autoDeductProductionToggle"){appSettings.autoDeductProduction=e.target.checked;await persist();}
+  });
+
+  // ---------- Supabase auth / connect flow ----------
+  function showAuthMessage(kind,msg){
+    const err=$("#authError"), info=$("#authInfo");
+    err.style.display="none"; info.style.display="none";
+    const el=kind==="error"?err:info; el.textContent=msg; el.style.display="block";
+  }
+  function showAuthScreen(){
+    $("#loading").classList.add("hidden");
+    $("#app").classList.add("hidden");
+    $("#authScreen").classList.remove("hidden");
+  }
+  async function signIn(){
+    const email=$("#authEmail").value.trim(); const password=$("#authPassword").value;
+    if(!email||!password){showAuthMessage("error","اكتب البريد الإلكتروني وكلمة المرور");return;}
+    const btn=$("#signInBtn"); btn.disabled=true; btn.textContent="جاري الدخول...";
+    const {data,error}=await sb.auth.signInWithPassword({email,password});
+    btn.disabled=false; btn.textContent="دخول";
+    if(error){showAuthMessage("error",error.message||"تعذر تسجيل الدخول");return;}
+    currentUser=data.user; $("#authScreen").classList.add("hidden"); await connectAndStart();
+  }
+  async function signUp(){
+    const email=$("#authEmail").value.trim(); const password=$("#authPassword").value;
+    if(!email||!password){showAuthMessage("error","اكتب البريد الإلكتروني وكلمة مرور لا تقل عن 6 خانات");return;}
+    if(password.length<6){showAuthMessage("error","كلمة المرور لازم تكون 6 خانات أو أكثر");return;}
+    const btn=$("#signUpBtn"); btn.disabled=true; btn.textContent="جاري إنشاء الحساب...";
+    const {data,error}=await sb.auth.signUp({email,password});
+    btn.disabled=false; btn.textContent="إنشاء حساب لأول مرة";
+    if(error){showAuthMessage("error",error.message||"تعذر إنشاء الحساب");return;}
+    if(data.session){ currentUser=data.user; $("#authScreen").classList.add("hidden"); await connectAndStart(); }
+    else showAuthMessage("info","تم إنشاء الحساب. افتح بريدك وأكد الحساب، وبعدها ارجع واضغط دخول.");
+  }
+  async function connectAndStart(){
+    $("#loading .txt").textContent = "جاري تحميل بيانات Cakeyard من Supabase…";
+    $("#loading").classList.remove("hidden");
+    try{ await loadAll(); }
+    catch(err){
+      $("#loading").classList.add("hidden");
+      console.error(err);
+      const msg=String(err&&err.message||err||"");
+      if(msg.includes("get_cakeyard_state") || msg.includes("Could not find the function") || msg.includes("schema cache")){
+        alert("قاعدة بيانات Cakeyard تحتاج تهيئة أول مرة. شغّل ملف Cakeyard_Supabase_Setup.sql في SQL Editor ثم حدّث الصفحة.");
+      }else alert("تعذر تحميل بيانات Cakeyard من Supabase:\n"+msg);
+      return;
+    }
+    $("#headerDate").textContent = fmtHeaderToday();
+    $("#monthPicker").value = currentMonth;
+    $("#monthPicker").onchange = ()=>{ currentMonth = $("#monthPicker").value || currentMonth; renderDashboard(); };
+    $("#loading").classList.add("hidden");
+    $("#authScreen").classList.add("hidden");
+    $("#app").classList.remove("hidden");
+    render();
+  }
+  async function init(){
+    $("#signInBtn").onclick=signIn;
+    $("#signUpBtn").onclick=signUp;
+    $("#authPassword").onkeydown=e=>{if(e.key==="Enter")signIn();};
+    const {data:{session}}=await sb.auth.getSession();
+    if(session&&session.user){currentUser=session.user;await connectAndStart();}
+    else showAuthScreen();
+  }
+  init();
+})();
+</script>
+</body>
+</html>
